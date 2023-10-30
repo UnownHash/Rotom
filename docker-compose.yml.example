@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   rotom:
-    image: ghcr.io/unownhash/rotom:master
+    image: ghcr.io/unownhash/rotom:main
     container_name: rotom
     restart: unless-stopped
     volumes:
