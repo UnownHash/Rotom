@@ -1,0 +1,8 @@
+{
+  "name": "@rotom/types",
+  "version": "0.0.1",
+  "dependencies": {
+    "@swc/helpers": "~0.3.3"
+  },
+  "devDependencies": {}
+}

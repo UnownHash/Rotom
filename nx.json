@@ -1,0 +1,37 @@
+{
+  "extends": "nx/presets/core.json",
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "npmScope": "rotom",
+  "affected": {
+    "defaultBase": "main"
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/node"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "accessToken": "M2M3OTdiZTMtZjgyNy00M2NiLThmNWYtYTQ2YzE3ZjA3NThmfHJlYWQtd3JpdGU="
+      }
+    }
+  },
+  "defaultProject": "server",
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "style": "none",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "none"
+      },
+      "library": {
+        "style": "none",
+        "linter": "eslint"
+      }
+    }
+  }
+}

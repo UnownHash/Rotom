@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  rotom:
+    image: ghcr.io/unownhash/rotom:master
+    container_name: rotom
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./config/local.json
+        target: /rotom/config/local.json
+      # optional volumes if you want to have access to logs or import your jobs
+      # comment if not needed
+      - ${PWD}/logs:/rotom/logs
+      - ${PWD}/jobs:/rotom/jobs
+    ports:
+      - "7070:7070"
+      - "7071:7071"
+      - "7072:7072"

@@ -1,0 +1,24 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "declaration": false,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "lib": ["es2017", "dom"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "paths": {
+      "@rotom/config": ["packages/config/src/index.ts"],
+      "@rotom/connections": ["packages/connections/src/index.ts"],
+      "@rotom/types": ["packages/types/src/index.ts"]
+    },
+    "rootDir": ".",
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2015"
+  },
+  "exclude": ["node_modules", "tmp"]
+}

@@ -1,0 +1,22 @@
+{
+  "deviceListener": {
+    "port": 7070
+  },
+  "controllerListener":{
+    "port": 7071
+  },
+  "client": {
+    "port": 7072,
+    "host": "127.0.0.1"
+  },
+  "monitor":{
+    "reboot": false,
+    // min required memory
+    "minMemory": 30000,
+    // restart/reboot over minMemory * maxMemStartMultiple value
+    "maxMemStartMultiple": 2,
+    // if origin name starts with key, use value to overwrite maxMemStartMultiple
+    "maxMemStartMultipleOverwrite": { "atv": 15, "iphone": 7 },
+    "deviceCooldown": 25
+  }
+}

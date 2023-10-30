@@ -1,0 +1,13 @@
+*
+!config/default.json
+!jobs/example.json
+!logs/.keep
+!packages
+!tools
+
+!babel.config.json
+!nx.json
+!package-lock.json
+!package.json
+!tsconfig.base.json
+!workspace.json

@@ -1,0 +1,116 @@
+//RotomProtos V2
+syntax = "proto3";
+package RotomProtos;
+
+message MitmRequest {
+    enum Method {
+        UNSET = 0;
+        LOGIN = 1;
+        RPC_REQUEST = 2;
+    }
+
+    message LoginRequest {
+        enum LoginSource {
+            UNSET = 0;
+            PTC = 1;
+        }
+
+        string username = 1;
+        LoginSource source = 2;
+        bytes token_proto = 3;
+        string worker_id = 4;
+    }
+
+    message RpcRequest {
+        message SingleRpcRequest {
+            int32 method = 1;
+            bytes payload = 2;
+        }
+
+        repeated SingleRpcRequest request = 1;
+        double lat = 2;
+        double lon = 3;
+    }
+
+    uint32 id = 1;
+    Method method = 2;
+    oneof payload {
+        LoginRequest login_request = 3;
+        RpcRequest rpc_request = 4;
+    }
+}
+
+message MitmResponse {
+    enum Status {
+        UNSET = 0;
+        SUCCESS = 200;
+        ERROR_UNKNOWN = 500;
+        ERROR_GAME_NOT_READY = 501;
+        ERROR_LOGIN_IN_PROGRESS = 502;
+        ERROR_TOKEN_REJECTED = 503;
+        ERROR_NOT_LOGGED_IN = 504;
+    }
+
+    message LoginResponse {
+        string device_id = 1;
+        AuthStatus status = 2;
+    }
+
+    message RpcResponse {
+        message SingleRpcResponse {
+            int32 method = 1;
+            bytes payload = 2;
+        }
+
+        RpcStatus rpc_status = 1;
+        repeated SingleRpcResponse response = 2;
+    }
+
+    uint32 id = 1;
+    Status status = 2;
+    oneof payload {
+        LoginResponse login_response = 3;
+        RpcResponse rpc_response = 4;
+    }
+}
+
+message WelcomeMessage {
+    string worker_id = 1;
+    string origin = 2;
+    int32 version_code = 3;
+    string version_name = 4;
+    string useragent = 5;
+}
+
+enum AuthStatus {
+    AUTH_STATUS_UNSET = 0;
+    AUTH_STATUS_AUTH_TOKEN_REQUEST_FAILED = 1;
+    AUTH_STATUS_AUTH_TOKEN_REQUESTED = 2;
+    AUTH_STATUS_GOT_AUTH_TOKEN = 3;
+    AUTH_STATUS_DEVICE_INCOMPATIBLE = 4;
+    AUTH_STATUS_USER_NOT_FOUND = 5;
+    AUTH_STATUS_ACCESS_DENIED = 6;
+    AUTH_STATUS_ACCESS_SUSPENDED = 7;
+    AUTH_STATUS_SESSION_TERMINATED = 8;
+    AUTH_STATUS_SESSION_FAILED = 9;
+    AUTH_STATUS_LOGIN_TIMEOUT = 20;
+}
+
+enum RpcStatus {
+    RPC_STATUS_UNDEFINED = 0;
+    RPC_STATUS_SUCCESS = 1;
+    RPC_STATUS_BAD_RESPONSE = 3;
+    RPC_STATUS_ACTION_ERROR = 4;
+    RPC_STATUS_DISPATCH_ERROR = 5;
+    RPC_STATUS_SERVER_ERROR = 6;
+    RPC_STATUS_ASSIGNMENT_ERROR = 7;
+    RPC_STATUS_PROTOCOL_ERROR = 8;
+    RPC_STATUS_AUTHENTICATION_ERROR = 9;
+    RPC_STATUS_CANCELLED_REQUEST = 10;
+    RPC_STATUS_UNKNOWN_ERROR = 11;
+    RPC_STATUS_NO_RETRIES_ERROR = 12;
+    RPC_STATUS_UNAUTHORIZED_ERROR = 13;
+    RPC_STATUS_PARSING_ERROR = 14;
+    RPC_STATUS_ACCESS_DENIED = 15;
+    RPC_STATUS_ACCESS_SUSPENDED = 16;
+}

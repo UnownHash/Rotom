@@ -1,0 +1,12 @@
+[
+  {
+    "id": "test",
+    "description": "write to /sdcard/example.txt",
+    "exec": "echo it works >> /sdcard/example.txt"
+  },
+  {
+    "id": "whoami",
+    "description": "execute 'whoami'",
+    "exec": "whoami"
+  }
+]
