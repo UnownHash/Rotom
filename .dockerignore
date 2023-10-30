@@ -6,6 +6,7 @@
 !tools
 
 !babel.config.json
+!.gitignore
 !nx.json
 !package-lock.json
 !package.json
