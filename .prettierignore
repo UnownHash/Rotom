@@ -3,3 +3,5 @@
 /dist
 /coverage
 /packages/connections/src/lib/utils/mitmProto.d.ts
+
+/.nx/cache
