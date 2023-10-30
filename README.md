@@ -25,6 +25,21 @@ And then you can run the app:
 npm run start
 ```
 
+## PM2
+
+First, install the dependencies:
+```shell
+npm install
+```
+Then build the application:
+```shell
+npm run build
+```
+And then start application in PM2
+```shell
+pm2 start dist/packages/server/main.js --name rotom
+```
+
 ## Updating
 
 When pulling an update, if you see a change on the `package-lock.json` file, then you can run:
