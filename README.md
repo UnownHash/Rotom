@@ -14,7 +14,7 @@ port settings
 
 First, install the dependencies:
 ```shell
-npm install
+npm ci
 ```
 Then build the application:
 ```shell
@@ -29,7 +29,7 @@ npm run start
 
 First, install the dependencies:
 ```shell
-npm install
+npm ci
 ```
 Then build the application:
 ```shell
@@ -44,7 +44,7 @@ pm2 start dist/packages/server/main.js --name rotom
 
 When pulling an update, if you see a change on the `package-lock.json` file, then you can run:
 ```shell
-npm install
+npm ci
 ```
 Rebuild the app:
 ```shell
