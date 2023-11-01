@@ -290,9 +290,9 @@ setInterval(() => {
   Object.entries(controlConnections).forEach(([, connection]) => {
     const origin = connection?.origin || 'Unknown';
     connectedDevices += 1;
-    deviceMemoryFree.labels(origin).set(connection.lastMemory.memFree);
-    deviceMemoryMitm.labels(origin).set(connection.lastMemory.memMitm);
-    deviceMemoryStart.labels(origin).set(connection.lastMemory.memStart);
+    deviceMemoryFree.labels(origin).set(connection.lastMemory.memFree || 0);
+    deviceMemoryMitm.labels(origin).set(connection.lastMemory.memMitm || 0);
+    deviceMemoryStart.labels(origin).set(connection.lastMemory.memStart || 0);
   });
   // set number of active devices (couldn't get it correct with add/removal signals ; missed some decrement)
   devicesGauge.set(connectedDevices);
@@ -311,7 +311,7 @@ setInterval(() => {
 
   // set workers
   Object.entries(originActiveWorkers).forEach(([name, number]) => {
-    workersGauge.labels(name).set(number);
+    workersGauge.labels(name).set(number || 0);
   });
 }, 5000);
 
