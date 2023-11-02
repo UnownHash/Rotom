@@ -19,12 +19,14 @@ message MitmRequest {
         LoginSource source = 2;
         bytes token_proto = 3;
         string worker_id = 4;
+        bool enable_compression = 5;
     }
 
     message RpcRequest {
         message SingleRpcRequest {
             int32 method = 1;
             bytes payload = 2;
+            bool is_compressed = 3;
         }
 
         repeated SingleRpcRequest request = 1;
@@ -54,12 +56,14 @@ message MitmResponse {
     message LoginResponse {
         string device_id = 1;
         AuthStatus status = 2;
+        bool supports_compression = 3;
     }
 
     message RpcResponse {
         message SingleRpcResponse {
             int32 method = 1;
             bytes payload = 2;
+            bool is_compressed = 3;
         }
 
         RpcStatus rpc_status = 1;
@@ -80,6 +84,7 @@ message WelcomeMessage {
     int32 version_code = 3;
     string version_name = 4;
     string useragent = 5;
+    string device_id = 6;
 }
 
 enum AuthStatus {
@@ -91,8 +96,9 @@ enum AuthStatus {
     AUTH_STATUS_USER_NOT_FOUND = 5;
     AUTH_STATUS_ACCESS_DENIED = 6;
     AUTH_STATUS_ACCESS_SUSPENDED = 7;
-    AUTH_STATUS_SESSION_TERMINATED = 8;
-    AUTH_STATUS_SESSION_FAILED = 9;
+    AUTH_STATUS_ACCESS_RATE_LIMITED = 8;
+    AUTH_STATUS_SESSION_TERMINATED = 9;
+    AUTH_STATUS_SESSION_FAILED = 10;
     AUTH_STATUS_LOGIN_TIMEOUT = 20;
 }
 
@@ -113,4 +119,6 @@ enum RpcStatus {
     RPC_STATUS_PARSING_ERROR = 14;
     RPC_STATUS_ACCESS_DENIED = 15;
     RPC_STATUS_ACCESS_SUSPENDED = 16;
+    RPC_STATUS_DEVICE_INCOMPATIBLE = 17;
+    RPC_STATUS_ACCESS_RATE_LIMITED = 18;
 }

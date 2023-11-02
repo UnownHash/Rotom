@@ -375,6 +375,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
              * @property {RotomProtos.MitmRequest.LoginRequest.LoginSource|null} [source] LoginRequest source
              * @property {Uint8Array|null} [tokenProto] LoginRequest tokenProto
              * @property {string|null} [workerId] LoginRequest workerId
+             * @property {boolean|null} [enableCompression] LoginRequest enableCompression
              */
 
             /**
@@ -425,6 +426,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
             LoginRequest.prototype.workerId = "";
 
             /**
+             * LoginRequest enableCompression.
+             * @member {boolean} enableCompression
+             * @memberof RotomProtos.MitmRequest.LoginRequest
+             * @instance
+             */
+            LoginRequest.prototype.enableCompression = false;
+
+            /**
              * Creates a new LoginRequest instance using the specified properties.
              * @function create
              * @memberof RotomProtos.MitmRequest.LoginRequest
@@ -456,6 +465,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.tokenProto);
                 if (message.workerId != null && Object.hasOwnProperty.call(message, "workerId"))
                     writer.uint32(/* id 4, wireType 2 =*/34).string(message.workerId);
+                if (message.enableCompression != null && Object.hasOwnProperty.call(message, "enableCompression"))
+                    writer.uint32(/* id 5, wireType 0 =*/40).bool(message.enableCompression);
                 return writer;
             };
 
@@ -504,6 +515,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         }
                     case 4: {
                             message.workerId = reader.string();
+                            break;
+                        }
+                    case 5: {
+                            message.enableCompression = reader.bool();
                             break;
                         }
                     default:
@@ -558,6 +573,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 if (message.workerId != null && message.hasOwnProperty("workerId"))
                     if (!$util.isString(message.workerId))
                         return "workerId: string expected";
+                if (message.enableCompression != null && message.hasOwnProperty("enableCompression"))
+                    if (typeof message.enableCompression !== "boolean")
+                        return "enableCompression: boolean expected";
                 return null;
             };
 
@@ -598,6 +616,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         message.tokenProto = object.tokenProto;
                 if (object.workerId != null)
                     message.workerId = String(object.workerId);
+                if (object.enableCompression != null)
+                    message.enableCompression = Boolean(object.enableCompression);
                 return message;
             };
 
@@ -625,6 +645,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             object.tokenProto = $util.newBuffer(object.tokenProto);
                     }
                     object.workerId = "";
+                    object.enableCompression = false;
                 }
                 if (message.username != null && message.hasOwnProperty("username"))
                     object.username = message.username;
@@ -634,6 +655,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     object.tokenProto = options.bytes === String ? $util.base64.encode(message.tokenProto, 0, message.tokenProto.length) : options.bytes === Array ? Array.prototype.slice.call(message.tokenProto) : message.tokenProto;
                 if (message.workerId != null && message.hasOwnProperty("workerId"))
                     object.workerId = message.workerId;
+                if (message.enableCompression != null && message.hasOwnProperty("enableCompression"))
+                    object.enableCompression = message.enableCompression;
                 return object;
             };
 
@@ -957,6 +980,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                  * @interface ISingleRpcRequest
                  * @property {number|null} [method] SingleRpcRequest method
                  * @property {Uint8Array|null} [payload] SingleRpcRequest payload
+                 * @property {boolean|null} [isCompressed] SingleRpcRequest isCompressed
                  */
 
                 /**
@@ -991,6 +1015,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 SingleRpcRequest.prototype.payload = $util.newBuffer([]);
 
                 /**
+                 * SingleRpcRequest isCompressed.
+                 * @member {boolean} isCompressed
+                 * @memberof RotomProtos.MitmRequest.RpcRequest.SingleRpcRequest
+                 * @instance
+                 */
+                SingleRpcRequest.prototype.isCompressed = false;
+
+                /**
                  * Creates a new SingleRpcRequest instance using the specified properties.
                  * @function create
                  * @memberof RotomProtos.MitmRequest.RpcRequest.SingleRpcRequest
@@ -1018,6 +1050,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.method);
                     if (message.payload != null && Object.hasOwnProperty.call(message, "payload"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.payload);
+                    if (message.isCompressed != null && Object.hasOwnProperty.call(message, "isCompressed"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isCompressed);
                     return writer;
                 };
 
@@ -1058,6 +1092,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             }
                         case 2: {
                                 message.payload = reader.bytes();
+                                break;
+                            }
+                        case 3: {
+                                message.isCompressed = reader.bool();
                                 break;
                             }
                         default:
@@ -1101,6 +1139,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     if (message.payload != null && message.hasOwnProperty("payload"))
                         if (!(message.payload && typeof message.payload.length === "number" || $util.isString(message.payload)))
                             return "payload: buffer expected";
+                    if (message.isCompressed != null && message.hasOwnProperty("isCompressed"))
+                        if (typeof message.isCompressed !== "boolean")
+                            return "isCompressed: boolean expected";
                     return null;
                 };
 
@@ -1123,6 +1164,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             $util.base64.decode(object.payload, message.payload = $util.newBuffer($util.base64.length(object.payload)), 0);
                         else if (object.payload.length >= 0)
                             message.payload = object.payload;
+                    if (object.isCompressed != null)
+                        message.isCompressed = Boolean(object.isCompressed);
                     return message;
                 };
 
@@ -1148,11 +1191,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             if (options.bytes !== Array)
                                 object.payload = $util.newBuffer(object.payload);
                         }
+                        object.isCompressed = false;
                     }
                     if (message.method != null && message.hasOwnProperty("method"))
                         object.method = message.method;
                     if (message.payload != null && message.hasOwnProperty("payload"))
                         object.payload = options.bytes === String ? $util.base64.encode(message.payload, 0, message.payload.length) : options.bytes === Array ? Array.prototype.slice.call(message.payload) : message.payload;
+                    if (message.isCompressed != null && message.hasOwnProperty("isCompressed"))
+                        object.isCompressed = message.isCompressed;
                     return object;
                 };
 
@@ -1574,6 +1620,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
              * @interface ILoginResponse
              * @property {string|null} [deviceId] LoginResponse deviceId
              * @property {RotomProtos.AuthStatus|null} [status] LoginResponse status
+             * @property {boolean|null} [supportsCompression] LoginResponse supportsCompression
              */
 
             /**
@@ -1608,6 +1655,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
             LoginResponse.prototype.status = 0;
 
             /**
+             * LoginResponse supportsCompression.
+             * @member {boolean} supportsCompression
+             * @memberof RotomProtos.MitmResponse.LoginResponse
+             * @instance
+             */
+            LoginResponse.prototype.supportsCompression = false;
+
+            /**
              * Creates a new LoginResponse instance using the specified properties.
              * @function create
              * @memberof RotomProtos.MitmResponse.LoginResponse
@@ -1635,6 +1690,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     writer.uint32(/* id 1, wireType 2 =*/10).string(message.deviceId);
                 if (message.status != null && Object.hasOwnProperty.call(message, "status"))
                     writer.uint32(/* id 2, wireType 0 =*/16).int32(message.status);
+                if (message.supportsCompression != null && Object.hasOwnProperty.call(message, "supportsCompression"))
+                    writer.uint32(/* id 3, wireType 0 =*/24).bool(message.supportsCompression);
                 return writer;
             };
 
@@ -1675,6 +1732,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         }
                     case 2: {
                             message.status = reader.int32();
+                            break;
+                        }
+                    case 3: {
+                            message.supportsCompression = reader.bool();
                             break;
                         }
                     default:
@@ -1729,9 +1790,13 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     case 7:
                     case 8:
                     case 9:
+                    case 10:
                     case 20:
                         break;
                     }
+                if (message.supportsCompression != null && message.hasOwnProperty("supportsCompression"))
+                    if (typeof message.supportsCompression !== "boolean")
+                        return "supportsCompression: boolean expected";
                 return null;
             };
 
@@ -1788,19 +1853,25 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 case 7:
                     message.status = 7;
                     break;
-                case "AUTH_STATUS_SESSION_TERMINATED":
+                case "AUTH_STATUS_ACCESS_RATE_LIMITED":
                 case 8:
                     message.status = 8;
                     break;
-                case "AUTH_STATUS_SESSION_FAILED":
+                case "AUTH_STATUS_SESSION_TERMINATED":
                 case 9:
                     message.status = 9;
+                    break;
+                case "AUTH_STATUS_SESSION_FAILED":
+                case 10:
+                    message.status = 10;
                     break;
                 case "AUTH_STATUS_LOGIN_TIMEOUT":
                 case 20:
                     message.status = 20;
                     break;
                 }
+                if (object.supportsCompression != null)
+                    message.supportsCompression = Boolean(object.supportsCompression);
                 return message;
             };
 
@@ -1820,11 +1891,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 if (options.defaults) {
                     object.deviceId = "";
                     object.status = options.enums === String ? "AUTH_STATUS_UNSET" : 0;
+                    object.supportsCompression = false;
                 }
                 if (message.deviceId != null && message.hasOwnProperty("deviceId"))
                     object.deviceId = message.deviceId;
                 if (message.status != null && message.hasOwnProperty("status"))
                     object.status = options.enums === String ? $root.RotomProtos.AuthStatus[message.status] === undefined ? message.status : $root.RotomProtos.AuthStatus[message.status] : message.status;
+                if (message.supportsCompression != null && message.hasOwnProperty("supportsCompression"))
+                    object.supportsCompression = message.supportsCompression;
                 return object;
             };
 
@@ -2027,6 +2101,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     case 14:
                     case 15:
                     case 16:
+                    case 17:
+                    case 18:
                         break;
                     }
                 if (message.response != null && message.hasOwnProperty("response")) {
@@ -2124,6 +2200,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 case 16:
                     message.rpcStatus = 16;
                     break;
+                case "RPC_STATUS_DEVICE_INCOMPATIBLE":
+                case 17:
+                    message.rpcStatus = 17;
+                    break;
+                case "RPC_STATUS_ACCESS_RATE_LIMITED":
+                case 18:
+                    message.rpcStatus = 18;
+                    break;
                 }
                 if (object.response) {
                     if (!Array.isArray(object.response))
@@ -2199,6 +2283,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                  * @interface ISingleRpcResponse
                  * @property {number|null} [method] SingleRpcResponse method
                  * @property {Uint8Array|null} [payload] SingleRpcResponse payload
+                 * @property {boolean|null} [isCompressed] SingleRpcResponse isCompressed
                  */
 
                 /**
@@ -2233,6 +2318,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 SingleRpcResponse.prototype.payload = $util.newBuffer([]);
 
                 /**
+                 * SingleRpcResponse isCompressed.
+                 * @member {boolean} isCompressed
+                 * @memberof RotomProtos.MitmResponse.RpcResponse.SingleRpcResponse
+                 * @instance
+                 */
+                SingleRpcResponse.prototype.isCompressed = false;
+
+                /**
                  * Creates a new SingleRpcResponse instance using the specified properties.
                  * @function create
                  * @memberof RotomProtos.MitmResponse.RpcResponse.SingleRpcResponse
@@ -2260,6 +2353,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.method);
                     if (message.payload != null && Object.hasOwnProperty.call(message, "payload"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.payload);
+                    if (message.isCompressed != null && Object.hasOwnProperty.call(message, "isCompressed"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isCompressed);
                     return writer;
                 };
 
@@ -2300,6 +2395,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             }
                         case 2: {
                                 message.payload = reader.bytes();
+                                break;
+                            }
+                        case 3: {
+                                message.isCompressed = reader.bool();
                                 break;
                             }
                         default:
@@ -2343,6 +2442,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     if (message.payload != null && message.hasOwnProperty("payload"))
                         if (!(message.payload && typeof message.payload.length === "number" || $util.isString(message.payload)))
                             return "payload: buffer expected";
+                    if (message.isCompressed != null && message.hasOwnProperty("isCompressed"))
+                        if (typeof message.isCompressed !== "boolean")
+                            return "isCompressed: boolean expected";
                     return null;
                 };
 
@@ -2365,6 +2467,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             $util.base64.decode(object.payload, message.payload = $util.newBuffer($util.base64.length(object.payload)), 0);
                         else if (object.payload.length >= 0)
                             message.payload = object.payload;
+                    if (object.isCompressed != null)
+                        message.isCompressed = Boolean(object.isCompressed);
                     return message;
                 };
 
@@ -2390,11 +2494,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                             if (options.bytes !== Array)
                                 object.payload = $util.newBuffer(object.payload);
                         }
+                        object.isCompressed = false;
                     }
                     if (message.method != null && message.hasOwnProperty("method"))
                         object.method = message.method;
                     if (message.payload != null && message.hasOwnProperty("payload"))
                         object.payload = options.bytes === String ? $util.base64.encode(message.payload, 0, message.payload.length) : options.bytes === Array ? Array.prototype.slice.call(message.payload) : message.payload;
+                    if (message.isCompressed != null && message.hasOwnProperty("isCompressed"))
+                        object.isCompressed = message.isCompressed;
                     return object;
                 };
 
@@ -2444,6 +2551,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
          * @property {number|null} [versionCode] WelcomeMessage versionCode
          * @property {string|null} [versionName] WelcomeMessage versionName
          * @property {string|null} [useragent] WelcomeMessage useragent
+         * @property {string|null} [deviceId] WelcomeMessage deviceId
          */
 
         /**
@@ -2502,6 +2610,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
         WelcomeMessage.prototype.useragent = "";
 
         /**
+         * WelcomeMessage deviceId.
+         * @member {string} deviceId
+         * @memberof RotomProtos.WelcomeMessage
+         * @instance
+         */
+        WelcomeMessage.prototype.deviceId = "";
+
+        /**
          * Creates a new WelcomeMessage instance using the specified properties.
          * @function create
          * @memberof RotomProtos.WelcomeMessage
@@ -2535,6 +2651,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.versionName);
             if (message.useragent != null && Object.hasOwnProperty.call(message, "useragent"))
                 writer.uint32(/* id 5, wireType 2 =*/42).string(message.useragent);
+            if (message.deviceId != null && Object.hasOwnProperty.call(message, "deviceId"))
+                writer.uint32(/* id 6, wireType 2 =*/50).string(message.deviceId);
             return writer;
         };
 
@@ -2589,6 +2707,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         message.useragent = reader.string();
                         break;
                     }
+                case 6: {
+                        message.deviceId = reader.string();
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -2639,6 +2761,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
             if (message.useragent != null && message.hasOwnProperty("useragent"))
                 if (!$util.isString(message.useragent))
                     return "useragent: string expected";
+            if (message.deviceId != null && message.hasOwnProperty("deviceId"))
+                if (!$util.isString(message.deviceId))
+                    return "deviceId: string expected";
             return null;
         };
 
@@ -2664,6 +2789,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 message.versionName = String(object.versionName);
             if (object.useragent != null)
                 message.useragent = String(object.useragent);
+            if (object.deviceId != null)
+                message.deviceId = String(object.deviceId);
             return message;
         };
 
@@ -2686,6 +2813,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 object.versionCode = 0;
                 object.versionName = "";
                 object.useragent = "";
+                object.deviceId = "";
             }
             if (message.workerId != null && message.hasOwnProperty("workerId"))
                 object.workerId = message.workerId;
@@ -2697,6 +2825,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 object.versionName = message.versionName;
             if (message.useragent != null && message.hasOwnProperty("useragent"))
                 object.useragent = message.useragent;
+            if (message.deviceId != null && message.hasOwnProperty("deviceId"))
+                object.deviceId = message.deviceId;
             return object;
         };
 
@@ -2741,8 +2871,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
      * @property {number} AUTH_STATUS_USER_NOT_FOUND=5 AUTH_STATUS_USER_NOT_FOUND value
      * @property {number} AUTH_STATUS_ACCESS_DENIED=6 AUTH_STATUS_ACCESS_DENIED value
      * @property {number} AUTH_STATUS_ACCESS_SUSPENDED=7 AUTH_STATUS_ACCESS_SUSPENDED value
-     * @property {number} AUTH_STATUS_SESSION_TERMINATED=8 AUTH_STATUS_SESSION_TERMINATED value
-     * @property {number} AUTH_STATUS_SESSION_FAILED=9 AUTH_STATUS_SESSION_FAILED value
+     * @property {number} AUTH_STATUS_ACCESS_RATE_LIMITED=8 AUTH_STATUS_ACCESS_RATE_LIMITED value
+     * @property {number} AUTH_STATUS_SESSION_TERMINATED=9 AUTH_STATUS_SESSION_TERMINATED value
+     * @property {number} AUTH_STATUS_SESSION_FAILED=10 AUTH_STATUS_SESSION_FAILED value
      * @property {number} AUTH_STATUS_LOGIN_TIMEOUT=20 AUTH_STATUS_LOGIN_TIMEOUT value
      */
     RotomProtos.AuthStatus = (function() {
@@ -2755,8 +2886,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
         values[valuesById[5] = "AUTH_STATUS_USER_NOT_FOUND"] = 5;
         values[valuesById[6] = "AUTH_STATUS_ACCESS_DENIED"] = 6;
         values[valuesById[7] = "AUTH_STATUS_ACCESS_SUSPENDED"] = 7;
-        values[valuesById[8] = "AUTH_STATUS_SESSION_TERMINATED"] = 8;
-        values[valuesById[9] = "AUTH_STATUS_SESSION_FAILED"] = 9;
+        values[valuesById[8] = "AUTH_STATUS_ACCESS_RATE_LIMITED"] = 8;
+        values[valuesById[9] = "AUTH_STATUS_SESSION_TERMINATED"] = 9;
+        values[valuesById[10] = "AUTH_STATUS_SESSION_FAILED"] = 10;
         values[valuesById[20] = "AUTH_STATUS_LOGIN_TIMEOUT"] = 20;
         return values;
     })();
@@ -2781,6 +2913,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
      * @property {number} RPC_STATUS_PARSING_ERROR=14 RPC_STATUS_PARSING_ERROR value
      * @property {number} RPC_STATUS_ACCESS_DENIED=15 RPC_STATUS_ACCESS_DENIED value
      * @property {number} RPC_STATUS_ACCESS_SUSPENDED=16 RPC_STATUS_ACCESS_SUSPENDED value
+     * @property {number} RPC_STATUS_DEVICE_INCOMPATIBLE=17 RPC_STATUS_DEVICE_INCOMPATIBLE value
+     * @property {number} RPC_STATUS_ACCESS_RATE_LIMITED=18 RPC_STATUS_ACCESS_RATE_LIMITED value
      */
     RotomProtos.RpcStatus = (function() {
         const valuesById = {}, values = Object.create(valuesById);
@@ -2800,6 +2934,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
         values[valuesById[14] = "RPC_STATUS_PARSING_ERROR"] = 14;
         values[valuesById[15] = "RPC_STATUS_ACCESS_DENIED"] = 15;
         values[valuesById[16] = "RPC_STATUS_ACCESS_SUSPENDED"] = 16;
+        values[valuesById[17] = "RPC_STATUS_DEVICE_INCOMPATIBLE"] = 17;
+        values[valuesById[18] = "RPC_STATUS_ACCESS_RATE_LIMITED"] = 18;
         return values;
     })();
 

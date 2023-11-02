@@ -143,6 +143,9 @@ export namespace RotomProtos {
 
             /** LoginRequest workerId */
             workerId?: (string|null);
+
+            /** LoginRequest enableCompression */
+            enableCompression?: (boolean|null);
         }
 
         /** Represents a LoginRequest. */
@@ -165,6 +168,9 @@ export namespace RotomProtos {
 
             /** LoginRequest workerId. */
             public workerId: string;
+
+            /** LoginRequest enableCompression. */
+            public enableCompression: boolean;
 
             /**
              * Creates a new LoginRequest instance using the specified properties.
@@ -372,6 +378,9 @@ export namespace RotomProtos {
 
                 /** SingleRpcRequest payload */
                 payload?: (Uint8Array|null);
+
+                /** SingleRpcRequest isCompressed */
+                isCompressed?: (boolean|null);
             }
 
             /** Represents a SingleRpcRequest. */
@@ -388,6 +397,9 @@ export namespace RotomProtos {
 
                 /** SingleRpcRequest payload. */
                 public payload: Uint8Array;
+
+                /** SingleRpcRequest isCompressed. */
+                public isCompressed: boolean;
 
                 /**
                  * Creates a new SingleRpcRequest instance using the specified properties.
@@ -608,6 +620,9 @@ export namespace RotomProtos {
 
             /** LoginResponse status */
             status?: (RotomProtos.AuthStatus|null);
+
+            /** LoginResponse supportsCompression */
+            supportsCompression?: (boolean|null);
         }
 
         /** Represents a LoginResponse. */
@@ -624,6 +639,9 @@ export namespace RotomProtos {
 
             /** LoginResponse status. */
             public status: RotomProtos.AuthStatus;
+
+            /** LoginResponse supportsCompression. */
+            public supportsCompression: boolean;
 
             /**
              * Creates a new LoginResponse instance using the specified properties.
@@ -816,6 +834,9 @@ export namespace RotomProtos {
 
                 /** SingleRpcResponse payload */
                 payload?: (Uint8Array|null);
+
+                /** SingleRpcResponse isCompressed */
+                isCompressed?: (boolean|null);
             }
 
             /** Represents a SingleRpcResponse. */
@@ -832,6 +853,9 @@ export namespace RotomProtos {
 
                 /** SingleRpcResponse payload. */
                 public payload: Uint8Array;
+
+                /** SingleRpcResponse isCompressed. */
+                public isCompressed: boolean;
 
                 /**
                  * Creates a new SingleRpcResponse instance using the specified properties.
@@ -930,6 +954,9 @@ export namespace RotomProtos {
 
         /** WelcomeMessage useragent */
         useragent?: (string|null);
+
+        /** WelcomeMessage deviceId */
+        deviceId?: (string|null);
     }
 
     /** Represents a WelcomeMessage. */
@@ -955,6 +982,9 @@ export namespace RotomProtos {
 
         /** WelcomeMessage useragent. */
         public useragent: string;
+
+        /** WelcomeMessage deviceId. */
+        public deviceId: string;
 
         /**
          * Creates a new WelcomeMessage instance using the specified properties.
@@ -1044,8 +1074,9 @@ export namespace RotomProtos {
         AUTH_STATUS_USER_NOT_FOUND = 5,
         AUTH_STATUS_ACCESS_DENIED = 6,
         AUTH_STATUS_ACCESS_SUSPENDED = 7,
-        AUTH_STATUS_SESSION_TERMINATED = 8,
-        AUTH_STATUS_SESSION_FAILED = 9,
+        AUTH_STATUS_ACCESS_RATE_LIMITED = 8,
+        AUTH_STATUS_SESSION_TERMINATED = 9,
+        AUTH_STATUS_SESSION_FAILED = 10,
         AUTH_STATUS_LOGIN_TIMEOUT = 20
     }
 
@@ -1066,6 +1097,8 @@ export namespace RotomProtos {
         RPC_STATUS_UNAUTHORIZED_ERROR = 13,
         RPC_STATUS_PARSING_ERROR = 14,
         RPC_STATUS_ACCESS_DENIED = 15,
-        RPC_STATUS_ACCESS_SUSPENDED = 16
+        RPC_STATUS_ACCESS_SUSPENDED = 16,
+        RPC_STATUS_DEVICE_INCOMPATIBLE = 17,
+        RPC_STATUS_ACCESS_RATE_LIMITED = 18
     }
 }
