@@ -1,9 +1,11 @@
 {
   "deviceListener": {
-    "port": 7070
+    "port": 7070,
+    "secret": ""
   },
   "controllerListener":{
-    "port": 7071
+    "port": 7071,
+    "secret": ""
   },
   "client": {
     "port": 7072,

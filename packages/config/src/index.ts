@@ -3,9 +3,11 @@ import { default as originalConfig } from 'config';
 interface Config {
   deviceListener: {
     port: number;
+    secret: string;
   };
   controllerListener: {
     port: number;
+    secret: string;
   };
   client: {
     port: number;
