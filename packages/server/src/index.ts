@@ -41,6 +41,13 @@ process
   });
 
 wssMitm.on('connection', (ws, req) => {
+  if (config.deviceListener.secret) {
+    if (config.deviceListener.secret != req.headers['x-rotom-secret']) {
+      log.info(`MITM: New connection from ${req.socket.remoteAddress} url ${req.url} - incorrect secret, rejecting`);
+      ws.close(3401, 'Invalid secret presented');
+      return;
+    }
+  }
   log.info(`MITM: New connection from ${req.socket.remoteAddress} url ${req.url}`);
 
   if (req.url === '/control') {
@@ -175,6 +182,29 @@ wssMitm.on('connection', (ws, req) => {
 
 const wssScanner = new WebSocketServer({ port: config.controllerListener.port });
 
+// function onSocketError(err: Error) {
+//   log.info(err);
+// }
+//
+// wssScanner.on('upgrade', (request, socket, head) => {
+//   socket.on('error', onSocketError);
+//
+//   // This function is not defined on purpose. Implement it with your own logic.
+//   authenticate(request, (err : Error, client) => {
+//     if (err || !client) {
+//       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+//       socket.destroy();
+//       return;
+//     }
+//
+//     socket.removeListener('error', onSocketError);
+//
+//     wssScanner.handleUpgrade(request, socket, head, function done(ws) {
+//       wssScanner.emit('connection', ws, request, client);
+//     });
+//   });
+// });
+
 function identifyControlChannelFromDevice(deviceId: string): string | null {
   // Find a currently connected control connection that starts with the same characters
   // as the given device id
@@ -185,6 +215,14 @@ function identifyControlChannelFromDevice(deviceId: string): string | null {
 }
 
 wssScanner.on('connection', (ws, req) => {
+  if (config.controllerListener.secret) {
+    if (config.controllerListener.secret != req.headers['x-rotom-secret']) {
+      log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - incorrect secret, rejecting`);
+      ws.close(3401, 'Invalid secret presented');
+      return;
+    }
+  }
+
   if (!unallocatedConnections.length) {
     log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - no spare MITMs, rejecting`);
     // error!
