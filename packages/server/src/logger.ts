@@ -1,30 +1,30 @@
-import { appendFileSync } from 'fs';
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import { config } from '@rotom/config';
-import { ILogObject, Logger } from 'tslog';
 
-function logToTransport(logObject: ILogObject) {
-  appendFileSync('logs/logs.txt', JSON.stringify(logObject) + '\n');
-}
-
-export const log: Logger = new Logger({
-  name: 'rotom',
-  minLevel: config.logging && config.logging.debug ? 'debug' : 'info',
-  displayFilePath: 'hidden',
-  displayFunctionName: false,
-  displayLoggerName: false,
+const logFormat = winston.format.printf(({ level, timestamp, message, label }) => {
+  return `[${timestamp}] [${level.toUpperCase()}] [${label}] ${message}`;
 });
 
-if (config.logging.save) {
-  log.attachTransport(
-    {
-      silly: logToTransport,
-      debug: logToTransport,
-      trace: logToTransport,
-      info: logToTransport,
-      warn: logToTransport,
-      error: logToTransport,
-      fatal: logToTransport,
-    },
-    config.logging && config.logging.debug ? 'debug' : 'info',
-  );
-}
+const transport = new DailyRotateFile({
+  dirname: 'logs',
+  filename: 'rotom.log',
+  zippedArchive: true,
+  maxSize: config.logging.maxSize + 'm', // rotate when file size exceeds x MB
+  maxFiles: config.logging.maxAge + 'd', // keep logs for 14 days
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.label({ label: 'rotom' }), // Set your logger name
+    logFormat,
+  ),
+});
+
+export const log = winston.createLogger({
+  level: config.logging && config.logging.debug ? 'debug' : 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.label({ label: 'rotom' }), // Set your logger name
+    logFormat,
+  ),
+  transports: [transport],
+});
