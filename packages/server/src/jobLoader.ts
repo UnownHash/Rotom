@@ -54,7 +54,7 @@ export class JobLoader {
 
   watch() {
     chokidar
-      .watch('jobs/*', {
+      .watch('./jobs/*', {
         awaitWriteFinish: true,
       })
       .on('change', () => {

@@ -5,6 +5,11 @@
     "exec": "echo it works >> /sdcard/example.txt"
   },
   {
+    "id": "test-2",
+    "description": "",
+    "exec": "echo whoami"
+  },
+  {
     "id": "whoami",
     "description": "execute 'whoami'",
     "exec": "whoami"
