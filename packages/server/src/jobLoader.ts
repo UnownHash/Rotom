@@ -57,7 +57,7 @@ export class JobLoader {
       .watch('./jobs/*', {
         awaitWriteFinish: true,
       })
-      .on('change', () => {
+      .on('all', () => {
         this.load();
       });
   }
