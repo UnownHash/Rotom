@@ -56,8 +56,15 @@ export class JobLoader {
     chokidar
       .watch('./jobs', {
         awaitWriteFinish: true,
+        ignoreInitial: true,
       })
-      .on('all', () => {
+      .on('change', () => {
+        this.load();
+      })
+      .on('add', () => {
+        this.load();
+      })
+      .on('unlink', () => {
         this.load();
       });
   }

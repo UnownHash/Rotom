@@ -6,25 +6,25 @@ const logFormat = winston.format.printf(({ level, timestamp, message, label }) =
   return `[${timestamp}] [${level.toUpperCase()}] [${label}] ${message}`;
 });
 
-const transport = new DailyRotateFile({
-  dirname: 'logs',
-  filename: 'rotom.log',
-  zippedArchive: true,
-  maxSize: config.logging.maxSize + 'm', // rotate when file size exceeds x MB
-  maxFiles: config.logging.maxAge + 'd', // keep logs for 14 days
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.label({ label: 'rotom' }), // Set your logger name
-    logFormat,
-  ),
-});
+const transports = [];
+
+// Main log file transport
+if (config.logging.save) {
+  const mainTransport = new DailyRotateFile({
+    dirname: 'logs',
+    filename: 'rotom.log',
+    zippedArchive: true,
+    maxSize: config.logging.maxSize + 'm', // rotate when file size exceeds x MB
+    maxFiles: config.logging.maxAge + 'd', // keep logs for 14 days
+    format: winston.format.combine(winston.format.timestamp(), winston.format.label({ label: 'rotom' }), logFormat),
+  });
+  transports.push(mainTransport);
+}
+
+transports.push(new winston.transports.Console());
 
 export const log = winston.createLogger({
   level: config.logging && config.logging.debug ? 'debug' : 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.label({ label: 'rotom' }), // Set your logger name
-    logFormat,
-  ),
-  transports: [transport],
+  format: winston.format.combine(winston.format.timestamp(), winston.format.label({ label: 'rotom' }), logFormat),
+  transports: transports,
 });
