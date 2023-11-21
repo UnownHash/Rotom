@@ -15,6 +15,8 @@ interface Config {
   };
   logging: {
     save: boolean;
+    maxSize: number;
+    maxAge: number;
     debug: boolean;
     consoleStatus: boolean;
   };

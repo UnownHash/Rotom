@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { WebSocket } from 'ws';
-import { Logger } from 'tslog';
+import { Logger } from 'winston';
 import { MitmWorkerConnection } from './mitmWorkerConnection';
 import { DTO } from './utils/type';
 import { RotomProtos } from './utils/mitmProto';
