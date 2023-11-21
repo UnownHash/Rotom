@@ -328,9 +328,13 @@ setInterval(() => {
   Object.entries(controlConnections).forEach(([, connection]) => {
     const origin = connection?.origin || 'Unknown';
     connectedDevices += 1;
-    deviceMemoryFree.labels(origin).set(connection.lastMemory.memFree || 0);
-    deviceMemoryMitm.labels(origin).set(connection.lastMemory.memMitm || 0);
-    deviceMemoryStart.labels(origin).set(connection.lastMemory.memStart || 0);
+
+    const validMemFree = Number.isFinite(connection.lastMemory.memFree) ? connection.lastMemory.memFree : 0;
+    deviceMemoryFree.labels(origin).set(validMemFree);
+    const validMemMitm = Number.isFinite(connection.lastMemory.memMitm) ? connection.lastMemory.memMitm : 0;
+    deviceMemoryMitm.labels(origin).set(validMemMitm);
+    const validMemStart = Number.isFinite(connection.lastMemory.memStart) ? connection.lastMemory.memStart : 0;
+    deviceMemoryStart.labels(origin).set(validMemStart);
   });
   // set number of active devices (couldn't get it correct with add/removal signals ; missed some decrement)
   devicesGauge.set(connectedDevices);
@@ -349,7 +353,8 @@ setInterval(() => {
 
   // set workers
   Object.entries(originActiveWorkers).forEach(([name, number]) => {
-    workersGauge.labels(name).set(number || 0);
+    const validNumber = Number.isFinite(number) ? number : 0;
+    workersGauge.labels(name).set(validNumber);
   });
 }, 5000);
 
