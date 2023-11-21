@@ -41,8 +41,9 @@
     "react-toastify": "^9.0.7",
     "regenerator-runtime": "0.13.7",
     "tslib": "^2.4.0",
-    "tslog": "^3.3.3",
     "utf-8-validate": "^5.0.9",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
     "ws": "^8.5.0"
   },
   "devDependencies": {

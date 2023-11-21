@@ -2,7 +2,7 @@ import chokidar from 'chokidar';
 import fs from 'fs';
 import path from 'path';
 import { Job } from '@rotom/types';
-import { Logger } from 'tslog';
+import { Logger } from 'winston';
 
 export class Jobs {
   jobs: Record<string, Job>;
@@ -54,10 +54,17 @@ export class JobLoader {
 
   watch() {
     chokidar
-      .watch('jobs/*', {
+      .watch('./jobs', {
         awaitWriteFinish: true,
+        ignoreInitial: true,
       })
       .on('change', () => {
+        this.load();
+      })
+      .on('add', () => {
+        this.load();
+      })
+      .on('unlink', () => {
         this.load();
       });
   }
