@@ -1,4 +1,4 @@
-import { Fragment, memo, useState } from 'react';
+import { memo, useState } from 'react';
 import { SortDescriptor, Table } from '@nextui-org/react';
 import { WorkerDTO, StatusDTO } from '@rotom/types';
 

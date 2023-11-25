@@ -1,4 +1,4 @@
-import { Fragment, memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { StatusDTO, MitmControlDTO } from '@rotom/types';
 import { Table, Dropdown, SortDescriptor } from '@nextui-org/react';
 import { toast } from 'react-toastify';
