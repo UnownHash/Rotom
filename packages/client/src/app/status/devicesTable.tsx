@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { StatusDTO, MitmControlDTO } from '@rotom/types';
 import { Table, Dropdown, SortDescriptor } from '@nextui-org/react';
 import { toast } from 'react-toastify';
@@ -62,11 +62,21 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
     initialSortDescriptor,
   });
 
-  if (list.items.length === 0) {
+  const filteredItems = useMemo(() => {
+    const lowercaseSearch = search.toLowerCase();
+    return list.items.filter(
+      (device) =>
+        !lowercaseSearch ||
+        device.origin?.toLowerCase().includes(lowercaseSearch) ||
+        device.deviceId?.toLowerCase().includes(lowercaseSearch) ||
+        device.version === lowercaseSearch,
+    );
+  }, [search, list.items]);
+
+  if (filteredItems.length === 0) {
     return <div />;
   }
 
-  const lowercaseSearch = search.toLowerCase();
   return (
     <>
       <SearchInput value={search} onChange={setSearch} />
@@ -111,61 +121,53 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
           <Table.Column>Actions</Table.Column>
         </Table.Header>
         <Table.Body loadingState={list.loadingState}>
-          {list.items
-            .filter(
-              (device) =>
-                !lowercaseSearch ||
-                device.origin?.toLowerCase().includes(lowercaseSearch) ||
-                device.deviceId?.toLowerCase().includes(lowercaseSearch) ||
-                device.version === lowercaseSearch,
-            )
-            .map((device, index) => {
-              const deviceWorkers = workers.filter((worker) => worker.deviceId === device.deviceId);
+          {filteredItems.map((device, index) => {
+            const deviceWorkers = workers.filter((worker) => worker.deviceId === device.deviceId);
 
-              return (
-                <Table.Row key={`${device.deviceId}-${index}`}>
-                  <Table.Cell>{device.origin}</Table.Cell>
-                  <Table.Cell>
-                    {deviceWorkers.filter((worker) => worker.isAllocated).length}/{deviceWorkers.length}
-                  </Table.Cell>
-                  <Table.Cell>{device.deviceId}</Table.Cell>
-                  <Table.Cell>{device.isAlive ? '✅' : '❌'}</Table.Cell>
-                  <Table.Cell>{device.version}</Table.Cell>
-                  <Table.Cell>
-                    <RelativeTimeLabel timestamp={device.dateLastMessageReceived} />
-                  </Table.Cell>
-                  <Table.Cell>
-                    <RelativeTimeLabel timestamp={device.dateLastMessageSent} />
-                  </Table.Cell>
-                  <Table.Cell>{kBNumberFormat.format(device.lastMemory.memFree)}</Table.Cell>
-                  <Table.Cell>{kBNumberFormat.format(device.lastMemory.memMitm)}</Table.Cell>
-                  <Table.Cell>{kBNumberFormat.format(device.lastMemory.memStart)}</Table.Cell>
-                  <Table.Cell>
-                    {device.deviceId !== undefined && (
-                      <Dropdown>
-                        <Dropdown.Button size="xs" css={{ minWidth: 0 }} />
-                        <Dropdown.Menu
-                          aria-label="Actions"
-                          onAction={(key) => {
-                            if (
-                              device.deviceId &&
-                              (key === 'restart' || key === 'reboot' || key === 'getLogcat' || key === 'delete')
-                            ) {
-                              executeAction({ deviceId: device.deviceId, action: key });
-                            }
-                          }}
-                        >
-                          <Dropdown.Item key="restart">Restart</Dropdown.Item>
-                          <Dropdown.Item key="reboot">Reboot</Dropdown.Item>
-                          <Dropdown.Item key="getLogcat">Logcat</Dropdown.Item>
-                          <Dropdown.Item key="delete">Delete</Dropdown.Item>
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    )}
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })}
+            return (
+              <Table.Row key={`${device.deviceId}-${index}`}>
+                <Table.Cell>{device.origin}</Table.Cell>
+                <Table.Cell>
+                  {deviceWorkers.filter((worker) => worker.isAllocated).length}/{deviceWorkers.length}
+                </Table.Cell>
+                <Table.Cell>{device.deviceId}</Table.Cell>
+                <Table.Cell>{device.isAlive ? '✅' : '❌'}</Table.Cell>
+                <Table.Cell>{device.version}</Table.Cell>
+                <Table.Cell>
+                  <RelativeTimeLabel timestamp={device.dateLastMessageReceived} />
+                </Table.Cell>
+                <Table.Cell>
+                  <RelativeTimeLabel timestamp={device.dateLastMessageSent} />
+                </Table.Cell>
+                <Table.Cell>{kBNumberFormat.format(device.lastMemory.memFree)}</Table.Cell>
+                <Table.Cell>{kBNumberFormat.format(device.lastMemory.memMitm)}</Table.Cell>
+                <Table.Cell>{kBNumberFormat.format(device.lastMemory.memStart)}</Table.Cell>
+                <Table.Cell>
+                  {device.deviceId !== undefined && (
+                    <Dropdown>
+                      <Dropdown.Button size="xs" css={{ minWidth: 0 }} />
+                      <Dropdown.Menu
+                        aria-label="Actions"
+                        onAction={(key) => {
+                          if (
+                            device.deviceId &&
+                            (key === 'restart' || key === 'reboot' || key === 'getLogcat' || key === 'delete')
+                          ) {
+                            executeAction({ deviceId: device.deviceId, action: key });
+                          }
+                        }}
+                      >
+                        <Dropdown.Item key="restart">Restart</Dropdown.Item>
+                        <Dropdown.Item key="reboot">Reboot</Dropdown.Item>
+                        <Dropdown.Item key="getLogcat">Logcat</Dropdown.Item>
+                        <Dropdown.Item key="delete">Delete</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  )}
+                </Table.Cell>
+              </Table.Row>
+            );
+          })}
         </Table.Body>
       </StatusTable>
     </>

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { SortDescriptor, Table } from '@nextui-org/react';
 import { WorkerDTO, StatusDTO } from '@rotom/types';
 
@@ -16,20 +16,30 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
     initialSortDescriptor,
   });
 
-  if (list.items.length === 0) {
+  const filteredItems = useMemo(() => {
+    const lowercaseSearch = search.toLowerCase();
+    return list.items.filter(
+      (worker) =>
+        !lowercaseSearch ||
+        worker.mitm.origin?.toLowerCase().includes(lowercaseSearch) ||
+        worker.workerId.toLowerCase().includes(lowercaseSearch) ||
+        worker.scanner?.workerName.toLowerCase().includes(lowercaseSearch),
+    );
+  }, [search, list.items]);
+
+  if (filteredItems.length === 0) {
     return <div />;
   }
 
-  const lowercaseSearch = search.toLowerCase();
   return (
     <>
       <SearchInput value={search} onChange={setSearch} />
       <StatusTable
         aria-label="Workers"
         onSortChange={list.sort}
-        rowsPerPage={100}
+        rowsPerPage={10}
         sortDescriptor={list.sortDescriptor}
-        tableLength={list.items.length}
+        tableLength={filteredItems.length}
       >
         <Table.Header>
           <Table.Column key="origin" allowsSorting>
@@ -52,28 +62,20 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
           </Table.Column>
         </Table.Header>
         <Table.Body loadingState={list.loadingState}>
-          {list.items
-            .filter(
-              (worker) =>
-                !lowercaseSearch ||
-                worker.mitm.origin?.toLowerCase().includes(lowercaseSearch) ||
-                worker.workerId.toLowerCase().includes(lowercaseSearch) ||
-                worker.scanner?.workerName.toLowerCase().includes(lowercaseSearch),
-            )
-            .map((worker, index) => (
-              <Table.Row key={`${worker.workerId}-${index}`}>
-                <Table.Cell>{worker.mitm.origin}</Table.Cell>
-                <Table.Cell>{worker.workerId}</Table.Cell>
-                <Table.Cell>{worker.isAllocated ? '✅' : '❌'}</Table.Cell>
-                <Table.Cell>{worker.scanner?.workerName}</Table.Cell>
-                <Table.Cell>
-                  <RelativeTimeLabel timestamp={worker.mitm.dateLastMessageReceived} />
-                </Table.Cell>
-                <Table.Cell>
-                  <RelativeTimeLabel timestamp={worker.mitm.dateLastMessageSent} />
-                </Table.Cell>
-              </Table.Row>
-            ))}
+          {filteredItems.map((worker, index) => (
+            <Table.Row key={`${worker.workerId}-${index}`}>
+              <Table.Cell>{worker.mitm.origin}</Table.Cell>
+              <Table.Cell>{worker.workerId}</Table.Cell>
+              <Table.Cell>{worker.isAllocated ? '✅' : '❌'}</Table.Cell>
+              <Table.Cell>{worker.scanner?.workerName}</Table.Cell>
+              <Table.Cell>
+                <RelativeTimeLabel timestamp={worker.mitm.dateLastMessageReceived} />
+              </Table.Cell>
+              <Table.Cell>
+                <RelativeTimeLabel timestamp={worker.mitm.dateLastMessageSent} />
+              </Table.Cell>
+            </Table.Row>
+          ))}
         </Table.Body>
       </StatusTable>
     </>
