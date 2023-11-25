@@ -81,7 +81,7 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
         onSortChange={list.sort}
         rowsPerPage={30}
         sortDescriptor={list.sortDescriptor}
-        tableLength={list.items.length}
+        tableLength={filteredItems.length}
       >
         <Table.Header>
           <Table.Column key="origin" allowsSorting>
