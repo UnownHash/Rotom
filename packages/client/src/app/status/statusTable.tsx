@@ -1,6 +1,6 @@
 import { Children } from 'react';
 import { CollectionElement } from '@react-types/shared';
-import { Table, TableProps } from '@nextui-org/react';
+import { Table, TableProps, Input } from '@nextui-org/react';
 
 interface StatusTableProps extends TableProps {
   tableLength: number;
