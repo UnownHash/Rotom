@@ -1,5 +1,5 @@
 import { Fragment, memo, useState } from 'react';
-import { Input, SortDescriptor, Table } from '@nextui-org/react';
+import { SortDescriptor, Table } from '@nextui-org/react';
 import { WorkerDTO, StatusDTO } from '@rotom/types';
 
 import { RelativeTimeLabel } from './relativeTimeLabel';
@@ -17,7 +17,7 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
   });
 
   if (list.items.length === 0) {
-    return <Fragment />;
+    return <div />;
   }
 
   const lowercaseSearch = search.toLowerCase();

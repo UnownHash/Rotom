@@ -63,7 +63,7 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
   });
 
   if (list.items.length === 0) {
-    return <Fragment />;
+    return <div />;
   }
 
   const lowercaseSearch = search.toLowerCase();
