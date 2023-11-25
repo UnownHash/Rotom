@@ -27,17 +27,13 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
     );
   }, [search, list.items]);
 
-  if (filteredItems.length === 0) {
-    return <div />;
-  }
-
   return (
     <>
       <SearchInput value={search} onChange={setSearch} />
       <StatusTable
         aria-label="Workers"
         onSortChange={list.sort}
-        rowsPerPage={10}
+        rowsPerPage={100}
         sortDescriptor={list.sortDescriptor}
         tableLength={filteredItems.length}
       >

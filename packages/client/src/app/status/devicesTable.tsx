@@ -73,10 +73,6 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
     );
   }, [search, list.items]);
 
-  if (filteredItems.length === 0) {
-    return <div />;
-  }
-
   return (
     <>
       <SearchInput value={search} onChange={setSearch} />
