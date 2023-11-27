@@ -75,7 +75,7 @@ export const makeServer = ({ environment = 'test' } = {}) => {
             version: '15',
             workerId: faker.vehicle.vrm() + `${i}`,
             deviceId: faker.vehicle.vrm(),
-            userAgent: ""
+            userAgent: '',
           };
         },
       }),

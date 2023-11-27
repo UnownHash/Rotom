@@ -139,7 +139,7 @@ export class MitmWorkerConnection extends EventEmitter {
       version: this.version,
       workerId: this.workerId,
       deviceId: this.deviceId,
-      userAgent: this.userAgent
+      userAgent: this.userAgent,
     };
   }
 }
