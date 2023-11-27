@@ -187,9 +187,9 @@ function identifyControlChannelFromWorkerId(workerId: string): string | null {
   const connection = currentConnections[workerId]
 
   if (connection) {
-    const workerId = connection.mitm?.workerId
-    if (workerId) {
-      return workerId
+    const deviceId = connection.mitm?.deviceId
+    if (deviceId) {
+      return deviceId
     }
   }
 
