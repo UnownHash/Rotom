@@ -222,18 +222,25 @@ wssScanner.on('connection', (ws, req) => {
   const firstSpareWorkerId = nextSpareWorkerId;
   do {
     const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId);
+    log.info(`SCANNER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`)
     if (mainDeviceId == null) {
       log.info(`SCANNER: Warning - found ${nextSpareWorkerId} in pool with no record of main device`);
       unallocatedConnections.push(nextSpareWorkerId);
       nextSpareWorkerId = unallocatedConnections.shift() as string;
     } else {
       const mainDeviceInfo = deviceInformation[mainDeviceId];
-      if (mainDeviceInfo.lastScannerConnection + config.monitor.deviceCooldown > Date.now() / 1000) {
-        // device was allocated to someone else too recently, find another
+      if (!mainDeviceInfo) {
+        log.info(`SCANNER: Warning - found ${nextSpareWorkerId} in pool with no record of main device ${mainDeviceId}`);
         unallocatedConnections.push(nextSpareWorkerId);
         nextSpareWorkerId = unallocatedConnections.shift() as string;
       } else {
-        eligibleDeviceFound = true;
+        if (mainDeviceInfo.lastScannerConnection + config.monitor.deviceCooldown > Date.now() / 1000) {
+          // device was allocated to someone else too recently, find another
+          unallocatedConnections.push(nextSpareWorkerId);
+          nextSpareWorkerId = unallocatedConnections.shift() as string;
+        } else {
+          eligibleDeviceFound = true;
+        }
       }
     }
   } while (!eligibleDeviceFound && nextSpareWorkerId != firstSpareWorkerId);
