@@ -1618,7 +1618,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
              * Properties of a LoginResponse.
              * @memberof RotomProtos.MitmResponse
              * @interface ILoginResponse
-             * @property {string|null} [deviceId] LoginResponse deviceId
+             * @property {string|null} [workerId] LoginResponse workerId
              * @property {RotomProtos.AuthStatus|null} [status] LoginResponse status
              * @property {boolean|null} [supportsCompression] LoginResponse supportsCompression
              */
@@ -1639,12 +1639,12 @@ export const RotomProtos = $root.RotomProtos = (() => {
             }
 
             /**
-             * LoginResponse deviceId.
-             * @member {string} deviceId
+             * LoginResponse workerId.
+             * @member {string} workerId
              * @memberof RotomProtos.MitmResponse.LoginResponse
              * @instance
              */
-            LoginResponse.prototype.deviceId = "";
+            LoginResponse.prototype.workerId = "";
 
             /**
              * LoginResponse status.
@@ -1686,8 +1686,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
             LoginResponse.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.deviceId != null && Object.hasOwnProperty.call(message, "deviceId"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.deviceId);
+                if (message.workerId != null && Object.hasOwnProperty.call(message, "workerId"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.workerId);
                 if (message.status != null && Object.hasOwnProperty.call(message, "status"))
                     writer.uint32(/* id 2, wireType 0 =*/16).int32(message.status);
                 if (message.supportsCompression != null && Object.hasOwnProperty.call(message, "supportsCompression"))
@@ -1727,7 +1727,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1: {
-                            message.deviceId = reader.string();
+                            message.workerId = reader.string();
                             break;
                         }
                     case 2: {
@@ -1773,9 +1773,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
             LoginResponse.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (message.deviceId != null && message.hasOwnProperty("deviceId"))
-                    if (!$util.isString(message.deviceId))
-                        return "deviceId: string expected";
+                if (message.workerId != null && message.hasOwnProperty("workerId"))
+                    if (!$util.isString(message.workerId))
+                        return "workerId: string expected";
                 if (message.status != null && message.hasOwnProperty("status"))
                     switch (message.status) {
                     default:
@@ -1812,8 +1812,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 if (object instanceof $root.RotomProtos.MitmResponse.LoginResponse)
                     return object;
                 let message = new $root.RotomProtos.MitmResponse.LoginResponse();
-                if (object.deviceId != null)
-                    message.deviceId = String(object.deviceId);
+                if (object.workerId != null)
+                    message.workerId = String(object.workerId);
                 switch (object.status) {
                 default:
                     if (typeof object.status === "number") {
@@ -1889,12 +1889,12 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     options = {};
                 let object = {};
                 if (options.defaults) {
-                    object.deviceId = "";
+                    object.workerId = "";
                     object.status = options.enums === String ? "AUTH_STATUS_UNSET" : 0;
                     object.supportsCompression = false;
                 }
-                if (message.deviceId != null && message.hasOwnProperty("deviceId"))
-                    object.deviceId = message.deviceId;
+                if (message.workerId != null && message.hasOwnProperty("workerId"))
+                    object.workerId = message.workerId;
                 if (message.status != null && message.hasOwnProperty("status"))
                     object.status = options.enums === String ? $root.RotomProtos.AuthStatus[message.status] === undefined ? message.status : $root.RotomProtos.AuthStatus[message.status] : message.status;
                 if (message.supportsCompression != null && message.hasOwnProperty("supportsCompression"))
@@ -2103,6 +2103,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     case 16:
                     case 17:
                     case 18:
+                    case 99:
                         break;
                     }
                 if (message.response != null && message.hasOwnProperty("response")) {
@@ -2207,6 +2208,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 case "RPC_STATUS_ACCESS_RATE_LIMITED":
                 case 18:
                     message.rpcStatus = 18;
+                    break;
+                case "RPC_STATUS_MITM_DISALLOWED_REQUEST":
+                case 99:
+                    message.rpcStatus = 99;
                     break;
                 }
                 if (object.response) {
@@ -2915,6 +2920,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
      * @property {number} RPC_STATUS_ACCESS_SUSPENDED=16 RPC_STATUS_ACCESS_SUSPENDED value
      * @property {number} RPC_STATUS_DEVICE_INCOMPATIBLE=17 RPC_STATUS_DEVICE_INCOMPATIBLE value
      * @property {number} RPC_STATUS_ACCESS_RATE_LIMITED=18 RPC_STATUS_ACCESS_RATE_LIMITED value
+     * @property {number} RPC_STATUS_MITM_DISALLOWED_REQUEST=99 RPC_STATUS_MITM_DISALLOWED_REQUEST value
      */
     RotomProtos.RpcStatus = (function() {
         const valuesById = {}, values = Object.create(valuesById);
@@ -2936,6 +2942,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
         values[valuesById[16] = "RPC_STATUS_ACCESS_SUSPENDED"] = 16;
         values[valuesById[17] = "RPC_STATUS_DEVICE_INCOMPATIBLE"] = 17;
         values[valuesById[18] = "RPC_STATUS_ACCESS_RATE_LIMITED"] = 18;
+        values[valuesById[99] = "RPC_STATUS_MITM_DISALLOWED_REQUEST"] = 99;
         return values;
     })();
 

@@ -182,34 +182,21 @@ wssMitm.on('connection', (ws, req) => {
 
 const wssScanner = new WebSocketServer({ port: config.controllerListener.port });
 
-// function onSocketError(err: Error) {
-//   log.info(err);
-// }
-//
-// wssScanner.on('upgrade', (request, socket, head) => {
-//   socket.on('error', onSocketError);
-//
-//   // This function is not defined on purpose. Implement it with your own logic.
-//   authenticate(request, (err : Error, client) => {
-//     if (err || !client) {
-//       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-//       socket.destroy();
-//       return;
-//     }
-//
-//     socket.removeListener('error', onSocketError);
-//
-//     wssScanner.handleUpgrade(request, socket, head, function done(ws) {
-//       wssScanner.emit('connection', ws, request, client);
-//     });
-//   });
-// });
+function identifyControlChannelFromWorkerId(workerId: string): string | null {
+  // Try to look up connected worker id and see if it presented us with a device id
+  const connection = currentConnections[workerId]
 
-function identifyControlChannelFromDevice(deviceId: string): string | null {
-  // Find a currently connected control connection that starts with the same characters
+  if (connection) {
+    const workerId = connection.mitm?.workerId
+    if (workerId) {
+      return workerId
+    }
+  }
+
+  // Fallback: Find a currently connected control connection that starts with the same characters
   // as the given device id
   for (const key of Object.keys(controlConnections)) {
-    if (deviceId.substring(0, key.length) === key) return key;
+    if (workerId.substring(0, key.length) === key) return key;
   }
   return null;
 }
@@ -230,30 +217,30 @@ wssScanner.on('connection', (ws, req) => {
     return;
   }
 
-  let nextSpareDeviceId = unallocatedConnections.shift() as string;
+  let nextSpareWorkerId = unallocatedConnections.shift() as string;
   let eligibleDeviceFound = false;
-  const firstSpareDeviceId = nextSpareDeviceId;
+  const firstSpareWorkerId = nextSpareWorkerId;
   do {
-    const mainDeviceId = identifyControlChannelFromDevice(nextSpareDeviceId);
+    const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId);
     if (mainDeviceId == null) {
-      log.info(`SCANNER: Warning - found ${nextSpareDeviceId} in pool with no record of main device`);
-      unallocatedConnections.push(nextSpareDeviceId);
-      nextSpareDeviceId = unallocatedConnections.shift() as string;
+      log.info(`SCANNER: Warning - found ${nextSpareWorkerId} in pool with no record of main device`);
+      unallocatedConnections.push(nextSpareWorkerId);
+      nextSpareWorkerId = unallocatedConnections.shift() as string;
     } else {
       const mainDeviceInfo = deviceInformation[mainDeviceId];
       if (mainDeviceInfo.lastScannerConnection + config.monitor.deviceCooldown > Date.now() / 1000) {
         // device was allocated to someone else too recently, find another
-        unallocatedConnections.push(nextSpareDeviceId);
-        nextSpareDeviceId = unallocatedConnections.shift() as string;
+        unallocatedConnections.push(nextSpareWorkerId);
+        nextSpareWorkerId = unallocatedConnections.shift() as string;
       } else {
         eligibleDeviceFound = true;
       }
     }
-  } while (!eligibleDeviceFound && nextSpareDeviceId != firstSpareDeviceId);
+  } while (!eligibleDeviceFound && nextSpareWorkerId != firstSpareWorkerId);
 
   if (!eligibleDeviceFound) {
     // no devices found, return the original one back to pool
-    unallocatedConnections.push(nextSpareDeviceId);
+    unallocatedConnections.push(nextSpareWorkerId);
     log.info(
       `SCANNER: New connection from ${req.socket.remoteAddress} - no MITMs available outside cooldown, rejecting`,
     );
@@ -263,12 +250,12 @@ wssScanner.on('connection', (ws, req) => {
   }
 
   // Set last connection time on device
-  const mainDeviceId = identifyControlChannelFromDevice(nextSpareDeviceId) as string;
+  const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId) as string;
   deviceInformation[mainDeviceId].lastScannerConnection = Date.now() / 1000;
 
-  log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - will allocate ${nextSpareDeviceId}`);
+  log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - will allocate ${nextSpareWorkerId}`);
 
-  const currentConnection = currentConnections[nextSpareDeviceId];
+  const currentConnection = currentConnections[nextSpareWorkerId];
   const scannerConnection = new ScannerConnection(log, ws, currentConnection.mitm);
   currentConnection.scanner = scannerConnection;
 
