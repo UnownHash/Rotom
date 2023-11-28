@@ -184,12 +184,12 @@ const wssScanner = new WebSocketServer({ port: config.controllerListener.port })
 
 function identifyControlChannelFromWorkerId(workerId: string): string | null {
   // Try to look up connected worker id and see if it presented us with a device id
-  const connection = currentConnections[workerId]
+  const connection = currentConnections[workerId];
 
   if (connection) {
-    const deviceId = connection.mitm?.deviceId
+    const deviceId = connection.mitm?.deviceId;
     if (deviceId) {
-      return deviceId
+      return deviceId;
     }
   }
 
@@ -222,7 +222,7 @@ wssScanner.on('connection', (ws, req) => {
   const firstSpareWorkerId = nextSpareWorkerId;
   do {
     const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId);
-    log.info(`SCANNER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`)
+    log.info(`SCANNER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`);
     if (mainDeviceId == null) {
       log.info(`SCANNER: Warning - found ${nextSpareWorkerId} in pool with no record of main device`);
       unallocatedConnections.push(nextSpareWorkerId);
