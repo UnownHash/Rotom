@@ -12,6 +12,8 @@ export type MitmWorkerDTO = Omit<DTO<MitmWorkerConnection>, 'ws' | 'log' | 'hear
 
 export class MitmWorkerConnection extends EventEmitter {
   workerId?: string;
+  deviceId?: string;
+  userAgent?: string;
   init: boolean;
   noMessagesReceived: number;
   dateLastMessageReceived: number;
@@ -65,6 +67,8 @@ export class MitmWorkerConnection extends EventEmitter {
         welcome = WelcomeMessage.decode(new Uint8Array(message));
 
         this.workerId = welcome.workerId;
+        this.deviceId = welcome.deviceId;
+        this.userAgent = welcome.useragent;
         this.version = welcome.versionCode.toString();
         this.origin = welcome.origin;
       } catch (e) {
@@ -134,6 +138,8 @@ export class MitmWorkerConnection extends EventEmitter {
       traceMessages: this.traceMessages,
       version: this.version,
       workerId: this.workerId,
+      deviceId: this.deviceId,
+      userAgent: this.userAgent,
     };
   }
 }
