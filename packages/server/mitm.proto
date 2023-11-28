@@ -54,7 +54,7 @@ message MitmResponse {
     }
 
     message LoginResponse {
-        string device_id = 1;
+        string worker_id = 1;
         AuthStatus status = 2;
         bool supports_compression = 3;
     }
@@ -121,4 +121,5 @@ enum RpcStatus {
     RPC_STATUS_ACCESS_SUSPENDED = 16;
     RPC_STATUS_DEVICE_INCOMPATIBLE = 17;
     RPC_STATUS_ACCESS_RATE_LIMITED = 18;
+    RPC_STATUS_MITM_DISALLOWED_REQUEST = 99;
 }
