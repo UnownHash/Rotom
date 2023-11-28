@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Modal, Table, Text, Input } from '@nextui-org/react';
+import { Button, Modal, Table, Text } from '@nextui-org/react';
 import { MitmControlDTO } from '@rotom/connections';
 import { Selection } from '@react-types/shared/src/selection';
 import { toast } from 'react-toastify';
