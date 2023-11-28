@@ -615,8 +615,8 @@ export namespace RotomProtos {
         /** Properties of a LoginResponse. */
         interface ILoginResponse {
 
-            /** LoginResponse deviceId */
-            deviceId?: (string|null);
+            /** LoginResponse workerId */
+            workerId?: (string|null);
 
             /** LoginResponse status */
             status?: (RotomProtos.AuthStatus|null);
@@ -634,8 +634,8 @@ export namespace RotomProtos {
              */
             constructor(properties?: RotomProtos.MitmResponse.ILoginResponse);
 
-            /** LoginResponse deviceId. */
-            public deviceId: string;
+            /** LoginResponse workerId. */
+            public workerId: string;
 
             /** LoginResponse status. */
             public status: RotomProtos.AuthStatus;
@@ -1099,6 +1099,7 @@ export namespace RotomProtos {
         RPC_STATUS_ACCESS_DENIED = 15,
         RPC_STATUS_ACCESS_SUSPENDED = 16,
         RPC_STATUS_DEVICE_INCOMPATIBLE = 17,
-        RPC_STATUS_ACCESS_RATE_LIMITED = 18
+        RPC_STATUS_ACCESS_RATE_LIMITED = 18,
+        RPC_STATUS_MITM_DISALLOWED_REQUEST = 99
     }
 }
