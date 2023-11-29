@@ -16,11 +16,11 @@ export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, de
   const [selectedDevices, setSelectedDevices] = useState<Selection>();
   const [search, setSearch] = useState('');
 
-const filteredDevices = useMemo(() => {
-  return devices?.filter(device =>
-    device.deviceId?.includes(search) || device.origin?.includes(search)
-  ) || [];
-}, [devices, search]);
+  const filteredDevices = useMemo(() => {
+    return devices?.filter((device) =>  
+      device.deviceId?.includes(search) || device.origin?.includes(search)
+    ) || [];
+  }, [devices, search]);
 
 
   const executeJob = async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
