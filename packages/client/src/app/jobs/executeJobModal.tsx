@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Button, Modal, Table, Text } from '@nextui-org/react';
 import { MitmControlDTO } from '@rotom/connections';
 import { Selection } from '@react-types/shared/src/selection';
@@ -20,22 +20,25 @@ export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, de
     return devices?.filter((device) => device.deviceId?.includes(search) || device.origin?.includes(search)) || [];
   }, [devices, search]);
 
-  const executeJob = async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
-    const promise = fetch(`/api/job/execute/${jobId}/${deviceIds.join()}`, { method: 'POST' }).then(
-      async (response) => {
-        if (response.status !== 200) {
-          throw new Error();
-        }
-        closeModal();
-      },
-    );
+  const executeJob = useCallback(
+    async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
+      const promise = fetch(`/api/job/execute/${jobId}/${deviceIds.join()}`, { method: 'POST' }).then(
+        async (response) => {
+          if (response.status !== 200) {
+            throw new Error();
+          }
+          closeModal();
+        },
+      );
 
-    toast.promise(promise, {
-      pending: `Running ${jobId}...`,
-      success: `${jobId} started successfully`,
-      error: `Failed to start job ${jobId}`,
-    });
-  };
+      toast.promise(promise, {
+        pending: `Running ${jobId}...`,
+        success: `${jobId} started successfully`,
+        error: `Failed to start job ${jobId}`,
+      });
+    },
+    [jobId, closeModal], // Abhängigkeiten
+  );
 
   return (
     <>
