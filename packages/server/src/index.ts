@@ -411,7 +411,9 @@ const routes = async (fastifyInstance: FastifyInstance) => {
         const connection = currentConnections[workerId];
         const isAllocated = !unallocatedConnections.includes(workerId);
 
-        const deviceId = Object.keys(controlConnections).find((deviceId) => workerId.startsWith(deviceId));
+        const deviceId =
+          connection.mitm?.deviceId ??
+          Object.keys(controlConnections).find((deviceId) => workerId.startsWith(deviceId));
 
         return {
           deviceId,
