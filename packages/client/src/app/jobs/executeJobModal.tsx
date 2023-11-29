@@ -37,7 +37,7 @@ export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, de
         error: `Failed to start job ${jobId}`,
       });
     },
-    [jobId, closeModal], // Abhängigkeiten
+    [jobId, closeModal], 
   );
 
   return (
