@@ -17,11 +17,8 @@ export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, de
   const [search, setSearch] = useState('');
 
   const filteredDevices = useMemo(() => {
-    return devices?.filter((device) =>  
-      device.deviceId?.includes(search) || device.origin?.includes(search)
-    ) || [];
+    return devices?.filter((device) => device.deviceId?.includes(search) || device.origin?.includes(search)) || [];
   }, [devices, search]);
-
 
   const executeJob = async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
     const promise = fetch(`/api/job/execute/${jobId}/${deviceIds.join()}`, { method: 'POST' }).then(
