@@ -38,6 +38,10 @@ process
     log.error(`${inspect(err)} Uncaught Exception thrown`);
 
     process.exit(1);
+  })
+  .on('SIGINT', function() {
+    console.log("Caught interrupt signal");
+    process.exit();
   });
 
 wssMitm.on('connection', (ws, req) => {
