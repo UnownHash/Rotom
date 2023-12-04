@@ -344,12 +344,13 @@ setInterval(() => {
     if (!(origin in originActiveWorkers)) {
       originActiveWorkers[origin] = 0;
     }
-    if (connection.scanner) {
+    if (connection.scanner && connection.scanner.isAlive && connection.mitm.isAlive) {
       originActiveWorkers[origin] += 1;
     }
   });
 
   // set workers
+  workersGauge.reset(); // Otherwise dropped devices stay stale
   Object.entries(originActiveWorkers).forEach(([name, number]) => {
     const validNumber = Number.isFinite(number) ? number : 0;
     workersGauge.labels(name).set(validNumber);
