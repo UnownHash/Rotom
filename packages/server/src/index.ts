@@ -323,7 +323,7 @@ if (config.logging.consoleStatus) {
 setInterval(() => {
   let connectedDevices = 0;
   // set memory
-  Object.entries(controlConnections).forEach(([, connection]) => {
+  Object.entries(controlConnections).filter(([, connection]) => connection.isAlive).forEach(([, connection]) => {
     const origin = connection?.origin || 'Unknown';
     connectedDevices += 1;
 
