@@ -85,8 +85,8 @@ wssMitm.on('connection', (ws, req) => {
             restartRequired = true;
           }
           if (memoryStatus.memStart) {
-            const prefix = Object.keys(config.monitor.maxMemStartMultipleOverwrite).find(
-              (key) => mitm.origin?.startsWith(key),
+            const prefix = Object.keys(config.monitor.maxMemStartMultipleOverwrite).find((key) =>
+              mitm.origin?.startsWith(key),
             );
 
             const value = prefix
@@ -325,11 +325,7 @@ if (config.logging.consoleStatus) {
 // This is not the Best way to do this, but previous attemps at active tracking via events have failed
 setInterval(() => {
   let connectedDevices = 0;
-  let totalDevices = 0;
 
-  Object.entries(controlConnections).forEach(([, connection]) => {
-    totalDevices += 1;
-  });
   // set memory for alive devices, but first reset to get rid of dropped origins
   deviceMemoryFree.reset();
   deviceMemoryMitm.reset();
@@ -347,8 +343,10 @@ setInterval(() => {
       const validMemStart = Number.isFinite(connection.lastMemory.memStart) ? connection.lastMemory.memStart : 0;
       deviceMemoryStart.labels(origin).set(validMemStart);
     });
+
+  // Set device counts
+  devicesTotalGauge.set(Object.keys(controlConnections).length);
   devicesAliveGauge.set(connectedDevices);
-  devicesTotalGauge.set(totalDevices);
 
   // fetch active workers
   const originActiveWorkers: Record<string, number> = {};
