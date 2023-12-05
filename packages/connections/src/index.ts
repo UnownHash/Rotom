@@ -1,3 +1,3 @@
-export * from './lib/scannerConnection';
-export * from './lib/mitmControlConnection';
-export * from './lib/mitmWorkerConnection';
+export * from './lib/controllerConnection';
+export * from './lib/deviceControlConnection';
+export * from './lib/deviceWorkerConnection';

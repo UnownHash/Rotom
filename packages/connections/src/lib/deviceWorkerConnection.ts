@@ -1,16 +1,16 @@
 import { EventEmitter } from 'events';
-import { WebSocket } from 'ws';
 import { Logger } from 'winston';
+import { WebSocket } from 'ws';
 
-import { DTO } from './utils/type';
 import { RotomProtos } from './utils/mitmProto';
+import { DTO } from './utils/type';
 import WelcomeMessage = RotomProtos.WelcomeMessage;
 
 let instanceNo = 0;
 
-export type MitmWorkerDTO = Omit<DTO<MitmWorkerConnection>, 'ws' | 'log' | 'heartbeatHandle'>;
+export type DeviceWorkerDTO = Omit<DTO<DeviceWorkerConnection>, 'ws' | 'log' | 'heartbeatHandle'>;
 
-export class MitmWorkerConnection extends EventEmitter {
+export class DeviceWorkerConnection extends EventEmitter {
   workerId?: string;
   deviceId?: string;
   userAgent?: string;
@@ -125,7 +125,7 @@ export class MitmWorkerConnection extends EventEmitter {
     this.emit('disconnected', this);
   }
 
-  serialize(): MitmWorkerDTO {
+  serialize(): DeviceWorkerDTO {
     return {
       dateLastMessageReceived: this.dateLastMessageReceived,
       dateLastMessageSent: this.dateLastMessageSent,

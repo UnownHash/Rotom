@@ -1,11 +1,11 @@
 import { Button, Loading, Modal, Table, useModal } from '@nextui-org/react';
-import { JobsDTO, MitmControlDTO } from '@rotom/types';
+import { JobsDTO, DeviceControlDTO } from '@rotom/types';
 import { useState } from 'react';
 
 import { ExecuteJobModal } from './executeJobModal';
 
 interface JobsTableProps {
-  devices?: MitmControlDTO[];
+  devices?: DeviceControlDTO[];
   isLoading: boolean;
   jobs: JobsDTO;
   refetchDevices: () => void;

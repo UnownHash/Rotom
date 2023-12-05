@@ -21,9 +21,9 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
     return list.items.filter(
       (worker) =>
         !lowercaseSearch ||
-        worker.mitm.origin?.toLowerCase().includes(lowercaseSearch) ||
+        worker.worker.origin?.toLowerCase().includes(lowercaseSearch) ||
         worker.workerId.toLowerCase().includes(lowercaseSearch) ||
-        worker.scanner?.workerName.toLowerCase().includes(lowercaseSearch),
+        worker.controller?.workerName.toLowerCase().includes(lowercaseSearch),
     );
   }, [search, list.items]);
 
@@ -60,15 +60,15 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
         <Table.Body loadingState={list.loadingState}>
           {filteredItems.map((worker, index) => (
             <Table.Row key={`${worker.workerId}-${index}`}>
-              <Table.Cell>{worker.mitm.origin}</Table.Cell>
+              <Table.Cell>{worker.worker.origin}</Table.Cell>
               <Table.Cell>{worker.workerId}</Table.Cell>
               <Table.Cell>{worker.isAllocated ? '✅' : '❌'}</Table.Cell>
-              <Table.Cell>{worker.scanner?.workerName}</Table.Cell>
+              <Table.Cell>{worker.controller?.workerName}</Table.Cell>
               <Table.Cell>
-                <RelativeTimeLabel timestamp={worker.mitm.dateLastMessageReceived} />
+                <RelativeTimeLabel timestamp={worker.worker.dateLastMessageReceived} />
               </Table.Cell>
               <Table.Cell>
-                <RelativeTimeLabel timestamp={worker.mitm.dateLastMessageSent} />
+                <RelativeTimeLabel timestamp={worker.worker.dateLastMessageSent} />
               </Table.Cell>
             </Table.Row>
           ))}
