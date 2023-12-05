@@ -8,7 +8,7 @@ import { StatusDTO, WorkerDTO, JobsDTO, JobsStatusDTO } from '@rotom/types';
 import {
   promRegistry,
   workersTotalGauge,
-  workersAliveGauge,
+  workersActiveGauge,
   devicesTotalGauge,
   devicesAliveGauge,
   deviceMemoryFree,
@@ -368,14 +368,14 @@ setInterval(() => {
 
   // set workers, but first reset to get rid of dropped origins
   workersTotalGauge.reset();
-  workersAliveGauge.reset();
+  workersActiveGauge.reset();
   Object.entries(originTotalWorkers).forEach(([name, number]) => {
     const validNumber = Number.isFinite(number) ? number : 0;
     workersTotalGauge.labels(name).set(validNumber);
   });
   Object.entries(originActiveWorkers).forEach(([name, number]) => {
     const validNumber = Number.isFinite(number) ? number : 0;
-    workersAliveGauge.labels(name).set(validNumber);
+    workersActiveGauge.labels(name).set(validNumber);
   });
 }, 5000);
 

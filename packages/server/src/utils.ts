@@ -24,9 +24,9 @@ export const workersTotalGauge = new Gauge({
   registers: [promRegistry],
 });
 
-export const workersAliveGauge = new Gauge({
-  name: prefix + 'workers_alive',
-  help: 'Workers that pass isAlive',
+export const workersActiveGauge = new Gauge({
+  name: prefix + 'workers_active',
+  help: 'Workers that have an active mitm connection',
   labelNames: ['origin'],
   registers: [promRegistry],
 });
