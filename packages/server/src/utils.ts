@@ -5,15 +5,28 @@ collectDefaultMetrics({ register: promRegistry });
 
 const prefix = 'rotom_';
 
-export const devicesGauge = new Gauge({
-  name: prefix + 'devices',
-  help: 'Devices in use',
+export const devicesTotalGauge = new Gauge({
+  name: prefix + 'devices_total',
+  help: 'Devices known regardless of state',
   registers: [promRegistry],
 });
 
-export const workersGauge = new Gauge({
-  name: prefix + 'workers',
-  help: 'Workers in use',
+export const devicesAliveGauge = new Gauge({
+  name: prefix + 'devices_alive',
+  help: 'Devices that pass isAlive',
+  registers: [promRegistry],
+});
+
+export const workersTotalGauge = new Gauge({
+  name: prefix + 'workers_total',
+  help: 'Workers known regardless of state',
+  labelNames: ['origin'],
+  registers: [promRegistry],
+});
+
+export const workersAliveGauge = new Gauge({
+  name: prefix + 'workers_alive',
+  help: 'Workers that pass isAlive',
   labelNames: ['origin'],
   registers: [promRegistry],
 });
