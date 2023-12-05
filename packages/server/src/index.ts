@@ -328,7 +328,6 @@ setInterval(() => {
   let totalDevices = 0;
 
   Object.entries(controlConnections).forEach(([, connection]) => {
-    const origin = connection?.origin || 'Unknown';
     totalDevices += 1;
   });
   // set memory for alive devices, but first reset to get rid of dropped origins
