@@ -17,7 +17,13 @@ export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, de
   const [search, setSearch] = useState('');
 
   const filteredDevices = useMemo(() => {
-    return devices?.filter((device) => device.deviceId?.includes(search) || device.origin?.includes(search)) || [];
+    return (
+      devices?.filter(
+        (device) =>
+          device.deviceId?.toLowerCase().includes(search.toLowerCase()) ||
+          device.origin?.toLowerCase().includes(search.toLowerCase()),
+      ) || []
+    );
   }, [devices, search]);
 
   const executeJob = useCallback(
