@@ -7,8 +7,10 @@ import { WebSocketServer } from 'ws';
 import { StatusDTO, WorkerDTO, JobsDTO, JobsStatusDTO } from '@rotom/types';
 import {
   promRegistry,
-  workersGauge,
-  devicesGauge,
+  workersTotalGauge,
+  workersActiveGauge,
+  devicesTotalGauge,
+  devicesAliveGauge,
   deviceMemoryFree,
   deviceMemoryMitm,
   deviceMemoryStart,
@@ -38,6 +40,10 @@ process
     log.error(`${inspect(err)} Uncaught Exception thrown`);
 
     process.exit(1);
+  })
+  .on('SIGINT', function () {
+    console.log('Caught interrupt signal');
+    process.exit();
   });
 
 wssMitm.on('connection', (ws, req) => {
@@ -316,39 +322,60 @@ if (config.logging.consoleStatus) {
 }
 
 // prometheus helper
+// This is not the Best way to do this, but previous attemps at active tracking via events have failed
 setInterval(() => {
   let connectedDevices = 0;
-  // set memory
-  Object.entries(controlConnections).forEach(([, connection]) => {
-    const origin = connection?.origin || 'Unknown';
-    connectedDevices += 1;
 
-    const validMemFree = Number.isFinite(connection.lastMemory.memFree) ? connection.lastMemory.memFree : 0;
-    deviceMemoryFree.labels(origin).set(validMemFree);
-    const validMemMitm = Number.isFinite(connection.lastMemory.memMitm) ? connection.lastMemory.memMitm : 0;
-    deviceMemoryMitm.labels(origin).set(validMemMitm);
-    const validMemStart = Number.isFinite(connection.lastMemory.memStart) ? connection.lastMemory.memStart : 0;
-    deviceMemoryStart.labels(origin).set(validMemStart);
-  });
-  // set number of active devices (couldn't get it correct with add/removal signals ; missed some decrement)
-  devicesGauge.set(connectedDevices);
+  // set memory for alive devices, but first reset to get rid of dropped origins
+  deviceMemoryFree.reset();
+  deviceMemoryMitm.reset();
+  deviceMemoryStart.reset();
+  Object.entries(controlConnections)
+    .filter(([, connection]) => connection.isAlive)
+    .forEach(([, connection]) => {
+      const origin = connection?.origin || 'Unknown';
+      connectedDevices += 1;
+
+      const validMemFree = Number.isFinite(connection.lastMemory.memFree) ? connection.lastMemory.memFree : 0;
+      deviceMemoryFree.labels(origin).set(validMemFree);
+      const validMemMitm = Number.isFinite(connection.lastMemory.memMitm) ? connection.lastMemory.memMitm : 0;
+      deviceMemoryMitm.labels(origin).set(validMemMitm);
+      const validMemStart = Number.isFinite(connection.lastMemory.memStart) ? connection.lastMemory.memStart : 0;
+      deviceMemoryStart.labels(origin).set(validMemStart);
+    });
+
+  // Set device counts
+  devicesTotalGauge.set(Object.keys(controlConnections).length);
+  devicesAliveGauge.set(connectedDevices);
 
   // fetch active workers
   const originActiveWorkers: Record<string, number> = {};
+  const originTotalWorkers: Record<string, number> = {};
   Object.entries(currentConnections).forEach(([, connection]) => {
     const origin = connection.mitm?.origin || 'Unknown';
     if (!(origin in originActiveWorkers)) {
       originActiveWorkers[origin] = 0;
     }
-    if (connection.scanner) {
+    if (!(origin in originTotalWorkers)) {
+      originTotalWorkers[origin] = 0;
+    }
+
+    originTotalWorkers[origin] += 1;
+    if (connection.scanner && connection.scanner.isAlive && connection.mitm.isAlive) {
       originActiveWorkers[origin] += 1;
     }
   });
 
-  // set workers
+  // set workers, but first reset to get rid of dropped origins
+  workersTotalGauge.reset();
+  workersActiveGauge.reset();
+  Object.entries(originTotalWorkers).forEach(([name, number]) => {
+    const validNumber = Number.isFinite(number) ? number : 0;
+    workersTotalGauge.labels(name).set(validNumber);
+  });
   Object.entries(originActiveWorkers).forEach(([name, number]) => {
     const validNumber = Number.isFinite(number) ? number : 0;
-    workersGauge.labels(name).set(validNumber);
+    workersActiveGauge.labels(name).set(validNumber);
   });
 }, 5000);
 
