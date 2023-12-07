@@ -465,6 +465,7 @@ const routes = async (fastifyInstance: FastifyInstance) => {
   });
 
   fastifyInstance.delete('/api/device', async (request, reply) => {
+    log.info('Received delete all devices request');
     const deviceIds = Object.keys(controlConnections);
     let deleted = 0;
     for (const deviceId of deviceIds) {
@@ -475,6 +476,7 @@ const routes = async (fastifyInstance: FastifyInstance) => {
         deleted++;
       }
     }
+    log.info(`Deleted ${deleted} devices`);
     return reply.code(200).send({ status: 'ok', error: `Deleted ${deleted} devices` });
   });
 

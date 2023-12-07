@@ -20,7 +20,7 @@ export const StatusPage = (): JSX.Element => {
     const cancel = new AbortController();
     const timer = setTimeout(() => cancel.abort(), 5000);
     try {
-      await fetch('/api/device/delete', { method: 'DELETE', signal: cancel.signal });
+      await fetch('/api/device', { method: 'DELETE', signal: cancel.signal });
     } catch (e) {
       console.error(e);
     } finally {
