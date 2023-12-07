@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { StatusDTO, MitmControlDTO } from '@rotom/types';
+import { StatusDTO, DeviceControlDTO } from '@rotom/types';
 import { Table, Dropdown, SortDescriptor } from '@nextui-org/react';
 import { toast } from 'react-toastify';
 
@@ -57,7 +57,7 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
     [],
   );
 
-  const list = useTableSort<MitmControlDTO>({
+  const list = useTableSort<DeviceControlDTO>({
     items: devices,
     initialSortDescriptor,
   });

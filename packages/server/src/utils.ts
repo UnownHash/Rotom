@@ -51,3 +51,10 @@ export const deviceMemoryStart = new Gauge({
   labelNames: ['origin'],
   registers: [promRegistry],
 });
+
+export function valueOrZero(value?: number): number {
+  if (value === undefined) {
+    return 0;
+  }
+  return Number.isNaN(value) ? 0 : value;
+}

@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
-import { WebSocket } from 'ws';
 import { Logger } from 'winston';
+import { WebSocket } from 'ws';
 
 import { DTO } from './utils/type';
 
@@ -19,7 +19,7 @@ class Deferred {
   }
 }
 
-export type MitmControlDTO = Omit<DTO<MitmControlConnection>, 'ws' | 'log' | 'heartbeatHandle'>;
+export type DeviceControlDTO = Omit<DTO<DeviceControlConnection>, 'ws' | 'log' | 'heartbeatHandle'>;
 
 interface MemoryStatus {
   memFree: number;
@@ -27,7 +27,7 @@ interface MemoryStatus {
   memStart: number;
 }
 
-export class MitmControlConnection extends EventEmitter {
+export class DeviceControlConnection extends EventEmitter {
   deviceId?: string;
   log: Logger;
   init: boolean;
@@ -91,7 +91,7 @@ export class MitmControlConnection extends EventEmitter {
         this.noMessagesReceived = 0;
         this.responses = {};
       } catch (e) {
-        this.log.error(`MITM /control - error decoding welcome message, disconnecting`);
+        this.log.error(`Device /control - error decoding welcome message, disconnecting`);
         this.ws.close();
         return;
       }
@@ -112,13 +112,13 @@ export class MitmControlConnection extends EventEmitter {
           promise.reject(`Status ${response.status} ${response.body?.errorReason ?? ''}`);
         }
       } else {
-        this.log.warn(`${this.deviceId}: <MITMC Unrecognised response ${message.toString()}`);
+        this.log.warn(`${this.deviceId}: <MITMC Unrecognized response ${message.toString()}`);
       }
     }
   }
 
   send(message: string) {
-    this.log.debug(`${this.deviceId}: MITMC> ${message}`);
+    this.log.debug(`${this.deviceId}: DEVICEC> ${message}`);
     this.noMessagesSent++;
     this.dateLastMessageSent = Date.now();
     this.ws.send(message.toString());
@@ -131,7 +131,7 @@ export class MitmControlConnection extends EventEmitter {
   checkHeartbeat() {
     if (!this.isAlive) {
       // Pong has not been received in last interval seconds
-      this.log.warn(`${this.deviceId}/${this.instanceNo}: MITM - No response to ping - forcing disconnect`);
+      this.log.warn(`${this.deviceId}/${this.instanceNo}: DEVICE - No response to ping - forcing disconnect`);
       clearInterval(this.heartbeatHandle);
       this.ws.terminate();
 
@@ -209,7 +209,7 @@ export class MitmControlConnection extends EventEmitter {
     return this.responses[id].promise;
   }
 
-  serialize(): MitmControlDTO {
+  serialize(): DeviceControlDTO {
     return {
       dateLastMessageReceived: this.dateLastMessageReceived,
       dateLastMessageSent: this.dateLastMessageSent,

@@ -1,12 +1,12 @@
 import { Button, Modal, Table, Text } from '@nextui-org/react';
-import { MitmControlDTO } from '@rotom/connections';
+import { DeviceControlDTO } from '@rotom/connections';
 import { Selection } from '@react-types/shared/src/selection';
 import { toast } from 'react-toastify';
 import { useCallback, useState } from 'react';
 
 interface ExecuteJobModalProps {
   closeModal: () => void;
-  devices?: MitmControlDTO[];
+  devices?: DeviceControlDTO[];
   jobId: string;
 }
 

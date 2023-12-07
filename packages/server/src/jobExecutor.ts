@@ -1,4 +1,4 @@
-import { MitmControlConnection } from '@rotom/connections';
+import { DeviceControlConnection } from '@rotom/connections';
 import { Job, JobStatus } from '@rotom/types';
 
 let jobExecutionNo = 1;
@@ -10,7 +10,7 @@ export class JobExecutor {
     this.jobStatus = {};
   }
 
-  runJob(device: MitmControlConnection, job: Job): number {
+  runJob(device: DeviceControlConnection, job: Job): number {
     const jobNo = jobExecutionNo++;
 
     this.jobStatus[jobNo] = {

@@ -1,6 +1,6 @@
 import { createServer, Model, Factory } from 'miragejs';
 import { faker } from '@faker-js/faker';
-import { StatusDTO, WorkerDTO, MitmControlDTO } from '@rotom/types';
+import { StatusDTO, WorkerDTO, DeviceControlDTO } from '@rotom/types';
 
 const getRecentTimestamp = (): number => {
   const thirtyMinutesAgo = new Date();
@@ -14,7 +14,7 @@ export const makeServer = ({ environment = 'test' } = {}) => {
     environment,
 
     models: {
-      device: Model.extend<Partial<MitmControlDTO>>({ version: '15' }),
+      device: Model.extend<Partial<DeviceControlDTO>>({ version: '15' }),
       worker: Model.extend<Partial<WorkerDTO>>({}),
     },
 
@@ -24,7 +24,7 @@ export const makeServer = ({ environment = 'test' } = {}) => {
     },
 
     factories: {
-      device: Factory.extend<Partial<MitmControlDTO>>({
+      device: Factory.extend<Partial<DeviceControlDTO>>({
         dateLastMessageReceived() {
           return getRecentTimestamp();
         },
@@ -61,7 +61,7 @@ export const makeServer = ({ environment = 'test' } = {}) => {
         workerId(i) {
           return faker.vehicle.vrm() + `${i}`;
         },
-        mitm(i) {
+        worker(i) {
           return {
             dateLastMessageReceived: getRecentTimestamp(),
             dateLastMessageSent: getRecentTimestamp(),
