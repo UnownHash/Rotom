@@ -464,6 +464,20 @@ const routes = async (fastifyInstance: FastifyInstance) => {
     }
   });
 
+  fastifyInstance.delete('/api/device', async (request, reply) => {
+    const deviceIds = Object.keys(controlConnections);
+    let deleted = 0;
+    for (const deviceId of deviceIds) {
+      const device = controlConnections[deviceId];
+      if (!device.isAlive) {
+        delete deviceInformation[deviceId];
+        delete controlConnections[deviceId];
+        deleted++;
+      }
+    }
+    return reply.code(200).send({ status: 'ok', error: `Deleted ${deleted} devices` });
+  });
+
   interface ActionExecuteParams {
     deviceId: keyof typeof controlConnections;
     action: 'restart' | 'reboot' | 'getLogcat' | 'delete';
