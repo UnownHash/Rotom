@@ -1,22 +1,25 @@
 import { EventEmitter } from 'events';
-import { WebSocket } from 'ws';
 import { Logger } from 'winston';
-import { MitmWorkerConnection } from './mitmWorkerConnection';
-import { DTO } from './utils/type';
+import { WebSocket } from 'ws';
+import { DeviceWorkerConnection } from './deviceWorkerConnection';
 import { RotomProtos } from './utils/mitmProto';
+import { DTO } from './utils/type';
 import MitmRequest = RotomProtos.MitmRequest;
 //import MitmCommand = RotomProtos.MitmCommand;
 
 let instanceNo = 0;
 
-export type ScannerConnectionDTO = Omit<DTO<ScannerConnection>, 'ws' | 'log' | 'heartbeatHandle' | 'mitmConnection'>;
+export type ControllerConnectionDTO = Omit<
+  DTO<ControllerConnection>,
+  'ws' | 'log' | 'heartbeatHandle' | 'deviceWorkerConnection'
+>;
 
-export class ScannerConnection extends EventEmitter {
-  _mitm_disconnect_handler: () => void;
-  _mitm_message_handler: (data: ArrayBuffer) => void;
+export class ControllerConnection extends EventEmitter {
+  _device_disconnect_handler: () => void;
+  _device_message_handler: (data: ArrayBuffer) => void;
   _ws_close_handler: () => void;
   _ws_message_handler: (data: ArrayBuffer) => void;
-  mitmConnection: MitmWorkerConnection;
+  deviceWorkerConnection: DeviceWorkerConnection;
   ws: WebSocket;
   log: Logger;
   heartbeatHandle: NodeJS.Timer;
@@ -26,7 +29,7 @@ export class ScannerConnection extends EventEmitter {
   isAlive: boolean;
   loginListener: number;
 
-  constructor(log: Logger, ws: WebSocket, mitmConnection: MitmWorkerConnection) {
+  constructor(log: Logger, ws: WebSocket, deviceWorkerConnection: DeviceWorkerConnection) {
     super();
     this.ws = ws;
     this.log = log;
@@ -38,16 +41,16 @@ export class ScannerConnection extends EventEmitter {
     this.instanceNo = instanceNo++;
 
     this._ws_message_handler = (data: ArrayBuffer) => this.#handleScannerMessage(data);
-    this._ws_close_handler = () => this.#handleScannerDisconnection();
+    this._ws_close_handler = () => this.#handleControllerDisconnection();
     ws.on('message', this._ws_message_handler);
     ws.on('close', this._ws_close_handler);
     ws.on('pong', () => this.heartbeat());
 
-    this.mitmConnection = mitmConnection;
-    this._mitm_message_handler = (data: ArrayBuffer) => this.#handleMitmMessage(data);
-    this._mitm_disconnect_handler = () => this.#handleMitmDisconnection();
-    this.mitmConnection.on('received', this._mitm_message_handler);
-    this.mitmConnection.on('disconnected', this._mitm_disconnect_handler);
+    this.deviceWorkerConnection = deviceWorkerConnection;
+    this._device_message_handler = (data: ArrayBuffer) => this.#handleMitmMessage(data);
+    this._device_disconnect_handler = () => this.#handleMitmDisconnection();
+    this.deviceWorkerConnection.on('received', this._device_message_handler);
+    this.deviceWorkerConnection.on('disconnected', this._device_disconnect_handler);
 
     this.heartbeatHandle = setInterval(() => this.checkHeartbeat(), 30000);
   }
@@ -73,7 +76,7 @@ export class ScannerConnection extends EventEmitter {
    * @returns {string}
    */
   get workerId(): string {
-    return this.mitmConnection.workerId as string;
+    return this.deviceWorkerConnection.workerId as string;
   }
 
   /**
@@ -81,7 +84,7 @@ export class ScannerConnection extends EventEmitter {
    * @returns {string}
    */
   get origin() {
-    return this.mitmConnection.origin;
+    return this.deviceWorkerConnection.origin;
   }
 
   /**
@@ -110,7 +113,7 @@ export class ScannerConnection extends EventEmitter {
       }
     }
 
-    this.mitmConnection.send(message);
+    this.deviceWorkerConnection.send(message);
   }
 
   /**
@@ -124,33 +127,33 @@ export class ScannerConnection extends EventEmitter {
     this.ws.send(message, { binary: true });
   }
 
-  #handleScannerDisconnection() {
+  #handleControllerDisconnection() {
     this.isAlive = false;
     clearInterval(this.heartbeatHandle);
 
     // Tell users scanner is disconnected
     this.emit('disconnected', this);
-    this.#disconnectFromMitmWebsocket();
+    this.#disconnectFromDeviceWebsocket();
   }
 
   /**
    * Disconnect scanner
    */
   disconnect() {
-    this.#disconnectFromMitmWebsocket();
+    this.#disconnectFromDeviceWebsocket();
     this.ws.close(3000, 'Device has been disconnected');
   }
 
   /**
-   * Disconnect associated mitm
+   * Disconnect associated device
    */
-  disconnectMitm() {
-    this.mitmConnection.ws.close(3005, 'Scanner disconnected');
+  disconnectDevice() {
+    this.deviceWorkerConnection.ws.close(3005, 'Controller disconnected');
   }
 
-  #disconnectFromMitmWebsocket() {
-    this.mitmConnection.removeListener('received', this._mitm_message_handler);
-    this.mitmConnection.removeListener('disconnected', this._mitm_disconnect_handler);
+  #disconnectFromDeviceWebsocket() {
+    this.deviceWorkerConnection.removeListener('received', this._device_message_handler);
+    this.deviceWorkerConnection.removeListener('disconnected', this._device_disconnect_handler);
   }
 
   heartbeat() {
@@ -183,7 +186,7 @@ export class ScannerConnection extends EventEmitter {
     this.ws.ping();
   }
 
-  serialize(): ScannerConnectionDTO {
+  serialize(): ControllerConnectionDTO {
     return {
       dateLastMessageSent: this.dateLastMessageSent,
       instanceNo: this.instanceNo,

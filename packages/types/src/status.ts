@@ -1,16 +1,16 @@
-import type { ScannerConnectionDTO, MitmControlDTO, MitmWorkerDTO } from '@rotom/connections';
+import type { ControllerConnectionDTO, DeviceControlDTO, DeviceWorkerDTO } from '@rotom/connections';
 
-export { ScannerConnectionDTO, MitmControlDTO, MitmWorkerDTO };
+export { ControllerConnectionDTO, DeviceControlDTO, DeviceWorkerDTO };
 
 export type WorkerDTO = {
-  deviceId?: string;
-  scanner?: ScannerConnectionDTO;
-  isAllocated: boolean;
-  mitm: MitmWorkerDTO;
   workerId: string;
+  deviceId?: string;
+  controller?: ControllerConnectionDTO;
+  isAllocated: boolean;
+  worker: DeviceWorkerDTO;
 };
 
 export interface StatusDTO {
   workers: WorkerDTO[];
-  devices: MitmControlDTO[];
+  devices: DeviceControlDTO[];
 }

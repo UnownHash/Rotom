@@ -1,5 +1,5 @@
 import { Text } from '@nextui-org/react';
-import { JobsDTO, JobsStatusDTO, MitmControlDTO, StatusDTO } from '@rotom/types';
+import { JobsDTO, JobsStatusDTO, DeviceControlDTO, StatusDTO } from '@rotom/types';
 import { useQuery } from '@tanstack/react-query';
 import { JobsTable } from './jobsTable';
 import { JobsStatusesTable } from './jobsStatusesTable';
@@ -19,7 +19,7 @@ export const JobsPage = (): JSX.Element => {
     refetchInterval: 5000,
   });
 
-  const { data: devices, refetch: refetchDevices } = useQuery<StatusDTO, Error, MitmControlDTO[]>(
+  const { data: devices, refetch: refetchDevices } = useQuery<StatusDTO, Error, DeviceControlDTO[]>(
     ['status'],
     fetchStatus,
     {

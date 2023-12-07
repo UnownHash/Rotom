@@ -1,8 +1,9 @@
 FROM node:18 AS build-env
-COPY . /app
+COPY package.json package-lock.json /app/
 WORKDIR /app
 
 RUN npm ci --no-save
+COPY . /app
 RUN npm run build
 # re-install without dev dependencies
 RUN npm ci --omit=dev

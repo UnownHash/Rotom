@@ -1,32 +1,38 @@
 process.title = 'Rotom';
 import { config } from '@rotom/config';
+import { ControllerConnection, DeviceControlConnection, DeviceWorkerConnection } from '@rotom/connections';
+import { JobsDTO, JobsStatusDTO, StatusDTO, WorkerDTO } from '@rotom/types';
 import { FastifyInstance } from 'fastify';
 import { inspect } from 'util';
-import { MitmWorkerConnection, ScannerConnection, MitmControlConnection } from '@rotom/connections';
 import { WebSocketServer } from 'ws';
-import { StatusDTO, WorkerDTO, JobsDTO, JobsStatusDTO } from '@rotom/types';
 import {
-  promRegistry,
-  workersGauge,
-  devicesGauge,
   deviceMemoryFree,
   deviceMemoryMitm,
   deviceMemoryStart,
+  devicesAliveGauge,
+  devicesTotalGauge,
+  promRegistry,
+  valueOrZero,
+  workersActiveGauge,
+  workersTotalGauge,
 } from './utils';
 
 import { JobExecutor } from './jobExecutor';
-import { jobs, JobLoader } from './jobLoader';
+import { JobLoader, jobs } from './jobLoader';
 import { log } from './logger';
-import { startWebserver, fastify } from './webserver';
+import { fastify, startWebserver } from './webserver';
 //import fa from '@faker-js/faker/locales/fa';
 
 /* Initialise websocket server from Mitm */
-const wssMitm = new WebSocketServer({ port: config.deviceListener.port, perMessageDeflate: false });
+const wssDevice = new WebSocketServer({ port: config.deviceListener.port, perMessageDeflate: false });
 
-const controlConnections: Record<string, MitmControlConnection> = {};
-const currentConnections: Record<string, { mitm: MitmWorkerConnection; scanner: ScannerConnection | null }> = {};
+const controlConnections: Record<string, DeviceControlConnection> = {};
+const currentConnections: Record<
+  string,
+  { deviceWorker: DeviceWorkerConnection; controller: ControllerConnection | null }
+> = {};
 const unallocatedConnections: string[] = [];
-const deviceInformation: Record<string, { lastScannerConnection: number }> = {};
+const deviceInformation: Record<string, { lastControllerConnection: number }> = {};
 
 process
   .on('unhandledRejection', (reason, p) => {
@@ -38,49 +44,53 @@ process
     log.error(`${inspect(err)} Uncaught Exception thrown`);
 
     process.exit(1);
+  })
+  .on('SIGINT', function () {
+    console.log('Caught interrupt signal');
+    process.exit();
   });
 
-wssMitm.on('connection', (ws, req) => {
+wssDevice.on('connection', (ws, req) => {
   if (config.deviceListener.secret) {
     if (config.deviceListener.secret != req.headers['x-rotom-secret']) {
-      log.info(`MITM: New connection from ${req.socket.remoteAddress} url ${req.url} - incorrect secret, rejecting`);
+      log.info(`Device: New connection from ${req.socket.remoteAddress} url ${req.url} - incorrect secret, rejecting`);
       ws.close(3401, 'Invalid secret presented');
       return;
     }
   }
-  log.info(`MITM: New connection from ${req.socket.remoteAddress} url ${req.url}`);
+  log.info(`Device: New connection from ${req.socket.remoteAddress} url ${req.url}`);
 
   if (req.url === '/control') {
-    const mitmControlConnection = new MitmControlConnection(log, ws);
-    mitmControlConnection.on('init', (mitm: MitmControlConnection) => {
+    const deviceControlConnection = new DeviceControlConnection(log, ws);
+    deviceControlConnection.on('init', (device: DeviceControlConnection) => {
       log.info(
-        `${mitm.deviceId}/${mitm.instanceNo}: Control Channel received id packet origin ${mitm.origin} - version ${mitm.version}`,
+        `${device.deviceId}/${device.instanceNo}: Control Channel received id packet origin ${device.origin} - version ${device.version}`,
       );
 
-      const deviceId = mitm.deviceId as string;
+      const deviceId = device.deviceId as string;
 
-      controlConnections[deviceId] = mitm;
+      controlConnections[deviceId] = device;
       deviceInformation[deviceId] = {
-        lastScannerConnection: Date.now() / 1000,
+        lastControllerConnection: Date.now() / 1000,
       };
 
-      const mitmTestIntervalHandle = setInterval(async () => {
-        // MITM current internal reboot logic:
+      const deviceTestIntervalHandle = setInterval(async () => {
+        // Device current internal reboot logic:
         // (((currentMemory/memoryUsageStart) > 2f && memFree < 80000) || memFree < 50000 || (currentMemory/memoryUsageStart) < 4f) && (Settings.memoryDetection && Settings.scanmode == 0)
 
         try {
-          const memoryStatus = await mitm.getMemoryUsage();
-          log.info(`${mitm.deviceId}/${mitm.instanceNo}:Memory = ${JSON.stringify(memoryStatus)}`);
+          const memoryStatus = await device.getMemoryUsage();
+          log.info(`${device.deviceId}/${device.instanceNo}:Memory = ${JSON.stringify(memoryStatus)}`);
           let restartRequired = false;
           if (memoryStatus.memFree && memoryStatus.memFree < config.monitor.minMemory) {
             log.warn(
-              `${mitm.deviceId}/${mitm.instanceNo}: ${memoryStatus.memFree} < ${config.monitor.minMemory} - RESTART REQUIRED`,
+              `${device.deviceId}/${device.instanceNo}: ${memoryStatus.memFree} < ${config.monitor.minMemory} - RESTART REQUIRED`,
             );
             restartRequired = true;
           }
           if (memoryStatus.memStart) {
             const prefix = Object.keys(config.monitor.maxMemStartMultipleOverwrite).find((key) =>
-              mitm.origin?.startsWith(key),
+              device.origin?.startsWith(key),
             );
 
             const value = prefix
@@ -89,7 +99,7 @@ wssMitm.on('connection', (ws, req) => {
 
             if (memoryStatus.memMitm > memoryStatus.memStart * value) {
               log.warn(
-                `${mitm.deviceId}/${mitm.instanceNo}: ${memoryStatus.memMitm} > ${memoryStatus.memStart} * ${value} - RESTART REQUIRED`,
+                `${device.deviceId}/${device.instanceNo}: ${memoryStatus.memMitm} > ${memoryStatus.memStart} * ${value} - RESTART REQUIRED`,
               );
               restartRequired = true;
             }
@@ -97,13 +107,13 @@ wssMitm.on('connection', (ws, req) => {
 
           if (restartRequired) {
             if (config.monitor.reboot) {
-              log.warn(`${mitm.deviceId}/${mitm.instanceNo}: Asking for reboot`);
+              log.warn(`${device.deviceId}/${device.instanceNo}: Asking for reboot`);
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              mitm.reboot().catch(() => {});
+              device.reboot().catch(() => {});
             } else {
-              log.warn(`${mitm.deviceId}/${mitm.instanceNo}: Asking for restart`);
+              log.warn(`${device.deviceId}/${device.instanceNo}: Asking for restart`);
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              mitm.restartApp().catch(() => {});
+              device.restartApp().catch(() => {});
             }
           }
         } catch {
@@ -111,59 +121,59 @@ wssMitm.on('connection', (ws, req) => {
         }
       }, 60000);
 
-      mitm.on('disconnected', (/* mitmControl: MitmControlConnection */) => {
+      device.on('disconnected', (/* mitmControl: MitmControlConnection */) => {
         // This would remove disconnected entries immediately
 
         // if (controlConnections[deviceId] && controlConnections[deviceId] == mitmControl) {
         //   delete controlConnections[deviceId];
         // }
 
-        clearInterval(mitmTestIntervalHandle);
+        clearInterval(deviceTestIntervalHandle);
       });
     });
     return;
   }
 
-  const mitmConnection = new MitmWorkerConnection(log, ws);
-  mitmConnection.on('init', (mitmWorker: MitmWorkerConnection) => {
+  const deviceConnection = new DeviceWorkerConnection(log, ws);
+  deviceConnection.on('init', (deviceWorker: DeviceWorkerConnection) => {
     log.info(
-      `${mitmWorker.workerId}/${mitmWorker.instanceNo}: Received id packet origin ${mitmWorker.origin} - version ${mitmWorker.version}`,
+      `${deviceWorker.workerId}/${deviceWorker.instanceNo}: Received id packet origin ${deviceWorker.origin} - version ${deviceWorker.version}`,
     );
 
-    const workerId = mitmWorker.workerId as string;
+    const workerId = deviceWorker.workerId as string;
 
     const currentConnection = currentConnections[workerId];
     if (currentConnection) {
-      log.info(`${mitmWorker.workerId}/${mitmWorker.instanceNo}: This is a reconnection, making this current`);
-      if (currentConnection.scanner) {
-        log.info(`${mitmWorker.workerId}/${mitmWorker.instanceNo}: Scanner was connected - closing it`);
-        currentConnection.scanner.disconnect();
+      log.info(`${deviceWorker.workerId}/${deviceWorker.instanceNo}: This is a reconnection, making this current`);
+      if (currentConnection.controller) {
+        log.info(`${deviceWorker.workerId}/${deviceWorker.instanceNo}: Controller was connected - closing it`);
+        currentConnection.controller.disconnect();
       }
     }
     currentConnections[workerId] = {
-      mitm: mitmWorker,
-      scanner: null,
+      deviceWorker: deviceWorker,
+      controller: null,
     };
     if (!unallocatedConnections.includes(workerId)) unallocatedConnections.push(workerId);
     log.info(`${workerId}: unallocated connections = ${unallocatedConnections.join(',')}`);
   });
 
-  mitmConnection.on('disconnected', (mitmWorker: MitmWorkerConnection) => {
-    const workerId = mitmWorker.workerId as string;
-    const instanceNo = mitmWorker.instanceNo;
+  deviceConnection.on('disconnected', (deviceWorker: DeviceWorkerConnection) => {
+    const workerId = deviceWorker.workerId as string;
+    const instanceNo = deviceWorker.instanceNo;
 
     console.log(`${workerId}/${instanceNo}: Disconnected; performing disconnection activities`);
     if (workerId) {
       const currentConnection = currentConnections[workerId];
       if (currentConnection) {
-        if (currentConnection.mitm !== mitmWorker) {
+        if (currentConnection.deviceWorker !== deviceWorker) {
           log.info(`${workerId}/${instanceNo}: Disconnection of non-current connection, ignoring`);
           return;
         }
 
-        if (currentConnection.scanner) {
-          log.info(`${workerId}: Disconnect: There was a Scanner connected, disconnecting`);
-          currentConnection.scanner.disconnect();
+        if (currentConnection.controller) {
+          log.info(`${workerId}: Disconnect: There was a Controller connected, disconnecting`);
+          currentConnection.controller.disconnect();
         }
       }
 
@@ -178,16 +188,16 @@ wssMitm.on('connection', (ws, req) => {
   });
 });
 
-/* Initialise websocket server from Scanner */
+/* Initialize websocket server from Controller */
 
-const wssScanner = new WebSocketServer({ port: config.controllerListener.port });
+const wssController = new WebSocketServer({ port: config.controllerListener.port });
 
 function identifyControlChannelFromWorkerId(workerId: string): string | null {
   // Try to look up connected worker id and see if it presented us with a device id
   const connection = currentConnections[workerId];
 
   if (connection) {
-    const deviceId = connection.mitm?.deviceId;
+    const deviceId = connection.deviceWorker?.deviceId;
     if (deviceId) {
       return deviceId;
     }
@@ -201,19 +211,19 @@ function identifyControlChannelFromWorkerId(workerId: string): string | null {
   return null;
 }
 
-wssScanner.on('connection', (ws, req) => {
+wssController.on('connection', (ws, req) => {
   if (config.controllerListener.secret) {
     if (config.controllerListener.secret != req.headers['x-rotom-secret']) {
-      log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - incorrect secret, rejecting`);
+      log.info(`CONTROLLER: New connection from ${req.socket.remoteAddress} - incorrect secret, rejecting`);
       ws.close(3401, 'Invalid secret presented');
       return;
     }
   }
 
   if (!unallocatedConnections.length) {
-    log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - no spare MITMs, rejecting`);
+    log.info(`CONTROLLER: New connection from ${req.socket.remoteAddress} - no spare Workers, rejecting`);
     // error!
-    ws.close(3001, 'No devices available');
+    ws.close(3001, 'No workers available');
     return;
   }
 
@@ -222,19 +232,21 @@ wssScanner.on('connection', (ws, req) => {
   const firstSpareWorkerId = nextSpareWorkerId;
   do {
     const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId);
-    log.info(`SCANNER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`);
+    log.info(`CONTROLLER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`);
     if (mainDeviceId == null) {
-      log.info(`SCANNER: Warning - found ${nextSpareWorkerId} in pool with no record of main device`);
+      log.info(`CONTROLLER: Warning - found ${nextSpareWorkerId} in pool with no record of main device`);
       unallocatedConnections.push(nextSpareWorkerId);
       nextSpareWorkerId = unallocatedConnections.shift() as string;
     } else {
       const mainDeviceInfo = deviceInformation[mainDeviceId];
       if (!mainDeviceInfo) {
-        log.info(`SCANNER: Warning - found ${nextSpareWorkerId} in pool with no record of main device ${mainDeviceId}`);
+        log.info(
+          `CONTROLLER: Warning - found ${nextSpareWorkerId} in pool with no record of main device ${mainDeviceId}`,
+        );
         unallocatedConnections.push(nextSpareWorkerId);
         nextSpareWorkerId = unallocatedConnections.shift() as string;
       } else {
-        if (mainDeviceInfo.lastScannerConnection + config.monitor.deviceCooldown > Date.now() / 1000) {
+        if (mainDeviceInfo.lastControllerConnection + config.monitor.deviceCooldown > Date.now() / 1000) {
           // device was allocated to someone else too recently, find another
           unallocatedConnections.push(nextSpareWorkerId);
           nextSpareWorkerId = unallocatedConnections.shift() as string;
@@ -249,7 +261,7 @@ wssScanner.on('connection', (ws, req) => {
     // no devices found, return the original one back to pool
     unallocatedConnections.push(nextSpareWorkerId);
     log.info(
-      `SCANNER: New connection from ${req.socket.remoteAddress} - no MITMs available outside cooldown, rejecting`,
+      `CONTROLLER: New connection from ${req.socket.remoteAddress} - no Devices available outside cooldown, rejecting`,
     );
     // error!
     ws.close(3001, 'All devices are in cooldown');
@@ -258,31 +270,31 @@ wssScanner.on('connection', (ws, req) => {
 
   // Set last connection time on device
   const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId) as string;
-  deviceInformation[mainDeviceId].lastScannerConnection = Date.now() / 1000;
+  deviceInformation[mainDeviceId].lastControllerConnection = Date.now() / 1000;
 
-  log.info(`SCANNER: New connection from ${req.socket.remoteAddress} - will allocate ${nextSpareWorkerId}`);
+  log.info(`CONTROLLER: New connection from ${req.socket.remoteAddress} - will allocate ${nextSpareWorkerId}`);
 
   const currentConnection = currentConnections[nextSpareWorkerId];
-  const scannerConnection = new ScannerConnection(log, ws, currentConnection.mitm);
-  currentConnection.scanner = scannerConnection;
+  const controllerConnection = new ControllerConnection(log, ws, currentConnection.deviceWorker);
+  currentConnection.controller = controllerConnection;
 
-  scannerConnection.on('disconnected', (con: ScannerConnection) => {
+  controllerConnection.on('disconnected', (con: ControllerConnection) => {
     // Replace webservice connection as available
     const workerId = con.workerId;
     log.info(
-      `SCANNER: Disconnected worker ${con.workerName}/${con.instanceNo} device - disconnecting from mitm to trigger cleanup`,
+      `CONTROLLER: Disconnected worker ${con.workerName}/${con.instanceNo} device - disconnecting from device to trigger cleanup`,
     );
 
-    // Mark this Scanner as not in use
+    // Mark this Controller as not in use
     const currentConnection = currentConnections[workerId];
     if (currentConnection) {
-      currentConnection.scanner = null;
+      currentConnection.controller = null;
     } else {
-      log.info(`SCANNER: did not find a connection from this MITM`);
+      log.info(`CONTROLLER: did not find a connection from this device`);
     }
 
-    // Now disconnect mitm
-    con.disconnectMitm();
+    // Now disconnect device
+    con.disconnectDevice();
   });
 });
 
@@ -296,15 +308,15 @@ if (config.logging.consoleStatus) {
     const dateNow = Date.now();
 
     for (const connections of Object.values(currentConnections)) {
-      if (connections && connections.mitm && connections.mitm.origin) {
-        const mitm = connections.mitm;
-        const SCANNER = connections.scanner;
+      if (connections && connections.deviceWorker && connections.deviceWorker.origin) {
+        const deviceWorker = connections.deviceWorker;
+        const CONTROLLER = connections.controller;
 
         connectionCounts.push(
-          `${mitm.origin}[${mitm.workerId}]: ${mitm.noMessagesSent}${
-            dateNow - mitm.dateLastMessageSent > 10000 ? '*' : ''
-          }/${mitm.noMessagesReceived}${dateNow - mitm.dateLastMessageReceived > 10000 ? '*' : ''} ${
-            SCANNER ? `SCANNER ${SCANNER.workerName}/${SCANNER.instanceNo}` : 'Unused'
+          `${deviceWorker.origin}[${deviceWorker.workerId}]: ${deviceWorker.noMessagesSent}${
+            dateNow - deviceWorker.dateLastMessageSent > 10000 ? '*' : ''
+          }/${deviceWorker.noMessagesReceived}${dateNow - deviceWorker.dateLastMessageReceived > 10000 ? '*' : ''} ${
+            CONTROLLER ? `CONTROLLER ${CONTROLLER.workerName}/${CONTROLLER.instanceNo}` : 'Unused'
           }`,
         );
       }
@@ -316,39 +328,56 @@ if (config.logging.consoleStatus) {
 }
 
 // prometheus helper
+// This is not the Best way to do this, but previous attemps at active tracking via events have failed
 setInterval(() => {
   let connectedDevices = 0;
-  // set memory
-  Object.entries(controlConnections).forEach(([, connection]) => {
-    const origin = connection?.origin || 'Unknown';
-    connectedDevices += 1;
 
-    const validMemFree = Number.isFinite(connection.lastMemory.memFree) ? connection.lastMemory.memFree : 0;
-    deviceMemoryFree.labels(origin).set(validMemFree);
-    const validMemMitm = Number.isFinite(connection.lastMemory.memMitm) ? connection.lastMemory.memMitm : 0;
-    deviceMemoryMitm.labels(origin).set(validMemMitm);
-    const validMemStart = Number.isFinite(connection.lastMemory.memStart) ? connection.lastMemory.memStart : 0;
-    deviceMemoryStart.labels(origin).set(validMemStart);
-  });
-  // set number of active devices (couldn't get it correct with add/removal signals ; missed some decrement)
-  devicesGauge.set(connectedDevices);
+  // set memory for alive devices, but first reset to get rid of dropped origins
+  deviceMemoryFree.reset();
+  deviceMemoryMitm.reset();
+  deviceMemoryStart.reset();
+  Object.entries(controlConnections)
+    .filter(([, connection]) => connection.isAlive)
+    .forEach(([, connection]) => {
+      const origin = connection?.origin || 'Unknown';
+      connectedDevices += 1;
+      const { memMitm, memFree, memStart } = connection.lastMemory;
+
+      deviceMemoryFree.labels(origin).set(valueOrZero(memFree));
+      deviceMemoryMitm.labels(origin).set(valueOrZero(memMitm));
+      deviceMemoryStart.labels(origin).set(valueOrZero(memStart));
+    });
+
+  // Set device counts
+  devicesTotalGauge.set(Object.keys(controlConnections).length);
+  devicesAliveGauge.set(connectedDevices);
 
   // fetch active workers
   const originActiveWorkers: Record<string, number> = {};
+  const originTotalWorkers: Record<string, number> = {};
   Object.entries(currentConnections).forEach(([, connection]) => {
-    const origin = connection.mitm?.origin || 'Unknown';
+    const origin = connection.deviceWorker?.origin || 'Unknown';
     if (!(origin in originActiveWorkers)) {
       originActiveWorkers[origin] = 0;
     }
-    if (connection.scanner) {
+    if (!(origin in originTotalWorkers)) {
+      originTotalWorkers[origin] = 0;
+    }
+
+    originTotalWorkers[origin] += 1;
+    if (connection.controller && connection.controller.isAlive && connection.deviceWorker.isAlive) {
       originActiveWorkers[origin] += 1;
     }
   });
 
-  // set workers
+  // set workers, but first reset to get rid of dropped origins
+  workersTotalGauge.reset();
+  workersActiveGauge.reset();
+  Object.entries(originTotalWorkers).forEach(([name, number]) => {
+    workersTotalGauge.labels(name).set(valueOrZero(number));
+  });
   Object.entries(originActiveWorkers).forEach(([name, number]) => {
-    const validNumber = Number.isFinite(number) ? number : 0;
-    workersGauge.labels(name).set(validNumber);
+    workersActiveGauge.labels(name).set(valueOrZero(number));
   });
 }, 5000);
 
@@ -411,13 +440,15 @@ const routes = async (fastifyInstance: FastifyInstance) => {
         const connection = currentConnections[workerId];
         const isAllocated = !unallocatedConnections.includes(workerId);
 
-        const deviceId = Object.keys(controlConnections).find((deviceId) => workerId.startsWith(deviceId));
+        const deviceId =
+          connection.deviceWorker?.deviceId ??
+          Object.keys(controlConnections).find((deviceId) => workerId.startsWith(deviceId));
 
         return {
           deviceId,
-          scanner: connection.scanner?.serialize(),
+          controller: connection.controller?.serialize(),
           isAllocated,
-          mitm: connection.mitm.serialize(),
+          worker: connection.deviceWorker.serialize(),
           workerId,
         };
       }),
@@ -503,7 +534,7 @@ const routes = async (fastifyInstance: FastifyInstance) => {
         return;
       }
 
-      const devices: MitmControlConnection[] = deviceIdsOrOrigins
+      const devices: DeviceControlConnection[] = deviceIdsOrOrigins
         .map((deviceIdOrOrigin) => {
           if (deviceIdOrOrigin in controlConnections) {
             return controlConnections[deviceIdOrOrigin];
@@ -511,7 +542,7 @@ const routes = async (fastifyInstance: FastifyInstance) => {
 
           return Object.values(controlConnections).find((device) => device.origin === deviceIdOrOrigin);
         })
-        .filter((device): device is MitmControlConnection => !!device);
+        .filter((device): device is DeviceControlConnection => !!device);
 
       if (devices.length === 0) {
         reply.code(404).send({ status: 'error', error: `No device found with IDS or origins ${deviceIdsOrOrigins}` });
