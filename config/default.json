@@ -13,7 +13,7 @@
   },
   "logging": {
     "save": false,
-    "maxSize": 1,
+    "maxSize": 100,
     "maxAge": 14,
     "debug": false,
     "consoleStatus": false
