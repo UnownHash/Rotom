@@ -21,6 +21,7 @@ interface Config {
     consoleStatus: boolean;
   };
   monitor: {
+    enabled: boolean;
     reboot: boolean;
     minMemory: number;
     maxMemStartMultiple: number;
