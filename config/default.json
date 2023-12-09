@@ -19,6 +19,7 @@
     "consoleStatus": false
   },
   "monitor": {
+    "enabled": true,
     "reboot": false,
     "minMemory": 30000,
     "maxMemStartMultiple": 2,
