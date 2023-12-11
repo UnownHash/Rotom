@@ -82,7 +82,7 @@ wssDevice.on('connection', (ws, req) => {
           const memoryStatus = await device.getMemoryUsage();
           log.info(`${device.deviceId}/${device.instanceNo}:Memory = ${JSON.stringify(memoryStatus)}`);
           let restartRequired = false;
-          if (memoryStatus.memFree && memoryStatus.memFree < config.monitor.minMemory) {
+          if (config.monitor.enabled && memoryStatus.memFree && memoryStatus.memFree < config.monitor.minMemory) {
             log.warn(
               `${device.deviceId}/${device.instanceNo}: ${memoryStatus.memFree} < ${config.monitor.minMemory} - RESTART REQUIRED`,
             );
@@ -97,7 +97,7 @@ wssDevice.on('connection', (ws, req) => {
               ? config.monitor.maxMemStartMultipleOverwrite[prefix]
               : config.monitor.maxMemStartMultiple;
 
-            if (memoryStatus.memMitm > memoryStatus.memStart * value) {
+            if (config.monitor.enabled && memoryStatus.memMitm > memoryStatus.memStart * value) {
               log.warn(
                 `${device.deviceId}/${device.instanceNo}: ${memoryStatus.memMitm} > ${memoryStatus.memStart} * ${value} - RESTART REQUIRED`,
               );
@@ -462,6 +462,22 @@ const routes = async (fastifyInstance: FastifyInstance) => {
     } catch (ex) {
       reply.status(500).send();
     }
+  });
+
+  fastifyInstance.delete('/api/device', async (request, reply) => {
+    log.info('Received delete all devices request');
+    const deviceIds = Object.keys(controlConnections);
+    let deleted = 0;
+    for (const deviceId of deviceIds) {
+      const device = controlConnections[deviceId];
+      if (!device.isAlive) {
+        delete deviceInformation[deviceId];
+        delete controlConnections[deviceId];
+        deleted++;
+      }
+    }
+    log.info(`Deleted ${deleted} devices`);
+    return reply.code(200).send({ status: 'ok', error: `Deleted ${deleted} devices` });
   });
 
   interface ActionExecuteParams {
