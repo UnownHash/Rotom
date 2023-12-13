@@ -15,19 +15,19 @@ export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalP
 
   const executeJob = useCallback(
     async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
-      const promise = fetch(`/api/job/execute/${jobId}/${deviceIds.join()}`, { method: 'POST' }).then(
-        async (response) => {
-          if (response.status !== 200) {
-            throw new Error();
-          }
-
-          closeModal();
-        },
-      );
+      const promise = fetch(`/api/job/execute/${jobId}`, {
+        method: 'POST',
+        body: JSON.stringify({ deviceIdsOrOrigins: deviceIds }),
+      }).then(async (response) => {
+        if (response.status !== 200) {
+          throw new Error();
+        }
+        closeModal();
+      });
 
       toast.promise(promise, {
         pending: `Running ${jobId}...`,
-        success: `${jobId} started succesfully`,
+        success: `${jobId} started successfully`,
         error: `Failed to start job ${jobId}`,
       });
     },

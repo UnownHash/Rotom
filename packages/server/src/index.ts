@@ -533,24 +533,31 @@ const routes = async (fastifyInstance: FastifyInstance) => {
   });
 
   interface JobExecuteParams {
-    deviceIdsOrOrigins: string;
+    deviceIdsOrOrigins?: string;
     jobId: string;
   }
 
-  fastifyInstance.post<{ Params: JobExecuteParams }>(
-    '/api/job/execute/:jobId/:deviceIdsOrOrigins',
+  fastifyInstance.post<{ Params: JobExecuteParams; Body: { deviceIdsOrOrigins?: string[] | number[] } }>(
+    '/api/job/execute/:jobId/:deviceIdsOrOrigins?',
     async (req, reply) => {
-      const deviceIdsOrOrigins = req.params.deviceIdsOrOrigins.split(',');
-      const jobId = req.params.jobId;
+      const { deviceIdsOrOrigins, jobId } = req.params;
+      const requestBody = req.body;
       const job = jobs.getById(jobId);
 
       if (!job) {
         reply.code(404).send({ status: 'error', error: 'Job not found' });
-
         return;
       }
 
-      const devices: DeviceControlConnection[] = deviceIdsOrOrigins
+      // If deviceIdsOrOrigins is not set in URL params, use the value from the request body
+      const deviceIdsOrOriginsList =
+        deviceIdsOrOrigins !== undefined && deviceIdsOrOrigins.trim() !== ''
+          ? deviceIdsOrOrigins.split(',')
+          : requestBody.deviceIdsOrOrigins !== undefined
+          ? requestBody.deviceIdsOrOrigins
+          : [];
+
+      const devices: DeviceControlConnection[] = deviceIdsOrOriginsList
         .map((deviceIdOrOrigin) => {
           if (deviceIdOrOrigin in controlConnections) {
             return controlConnections[deviceIdOrOrigin];
@@ -561,12 +568,14 @@ const routes = async (fastifyInstance: FastifyInstance) => {
         .filter((device): device is DeviceControlConnection => !!device);
 
       if (devices.length === 0) {
-        reply.code(404).send({ status: 'error', error: `No device found with IDS or origins ${deviceIdsOrOrigins}` });
+        reply
+          .code(404)
+          .send({ status: 'error', error: `No device found with IDS or origins ${deviceIdsOrOriginsList}` });
 
         return;
       }
 
-      log.info(`Execute job on device ${deviceIdsOrOrigins} job id ${jobId}`);
+      log.info(`Execute job on device ${deviceIdsOrOriginsList} job id ${jobId}`);
 
       const jobNumbers = devices.map((controlConnection) => {
         return jobExecutor.runJob(controlConnection, job);
