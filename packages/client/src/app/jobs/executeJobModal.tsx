@@ -17,6 +17,9 @@ export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalP
     async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
       const promise = fetch(`/api/job/execute/${jobId}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the Content-Type header to application/json
+        },
         body: JSON.stringify({ deviceIdsOrOrigins: deviceIds }),
       }).then(async (response) => {
         if (response.status !== 200) {

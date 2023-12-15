@@ -537,7 +537,11 @@ const routes = async (fastifyInstance: FastifyInstance) => {
     jobId: string;
   }
 
-  fastifyInstance.post<{ Params: JobExecuteParams; Body: { deviceIdsOrOrigins?: string[] | number[] } }>(
+  interface DeviceIdsOrOriginsBody {
+    deviceIdsOrOrigins?: string[] | number[];
+  }
+
+  fastifyInstance.post<{ Params: JobExecuteParams; Body: DeviceIdsOrOriginsBody }>(
     '/api/job/execute/:jobId/:deviceIdsOrOrigins?',
     async (req, reply) => {
       const { deviceIdsOrOrigins, jobId } = req.params;
