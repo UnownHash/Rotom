@@ -18,7 +18,7 @@ export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalP
       const promise = fetch(`/api/job/execute/${jobId}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // Set the Content-Type header to application/json
+          'Content-Type': 'application/json', // fastify is only able to parse the body to a project with this header
         },
         body: JSON.stringify({ deviceIdsOrOrigins: deviceIds }),
       }).then(async (response) => {
