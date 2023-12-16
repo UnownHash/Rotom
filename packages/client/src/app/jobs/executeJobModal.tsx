@@ -28,14 +28,18 @@ export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, de
 
   const executeJob = useCallback(
     async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
-      const promise = fetch(`/api/job/execute/${jobId}/${deviceIds.join()}`, { method: 'POST' }).then(
-        async (response) => {
-          if (response.status !== 200) {
-            throw new Error();
-          }
-          closeModal();
+      const promise = fetch(`/api/job/execute/${jobId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // fastify is only able to parse the body to a project with this header
         },
-      );
+        body: JSON.stringify({ deviceIdsOrOrigins: deviceIds }),
+      }).then(async (response) => {
+        if (response.status !== 200) {
+          throw new Error();
+        }
+        closeModal();
+      });
 
       toast.promise(promise, {
         pending: `Running ${jobId}...`,
