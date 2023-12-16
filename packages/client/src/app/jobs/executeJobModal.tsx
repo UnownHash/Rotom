@@ -1,8 +1,10 @@
+import React, { useState, useMemo, useCallback } from 'react';
 import { Button, Modal, Table, Text } from '@nextui-org/react';
 import { DeviceControlDTO } from '@rotom/connections';
 import { Selection } from '@react-types/shared/src/selection';
 import { toast } from 'react-toastify';
-import { useCallback, useState } from 'react';
+
+import { SearchInput } from '../status/search';
 
 interface ExecuteJobModalProps {
   closeModal: () => void;
@@ -10,8 +12,19 @@ interface ExecuteJobModalProps {
   jobId: string;
 }
 
-export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalProps): JSX.Element => {
+export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, devices, jobId }) => {
   const [selectedDevices, setSelectedDevices] = useState<Selection>();
+  const [search, setSearch] = useState('');
+
+  const filteredDevices = useMemo(() => {
+    return (
+      devices?.filter(
+        (device) =>
+          device.deviceId?.toLowerCase().includes(search.toLowerCase()) ||
+          device.origin?.toLowerCase().includes(search.toLowerCase()),
+      ) || []
+    );
+  }, [devices, search]);
 
   const executeJob = useCallback(
     async ({ deviceIds }: { deviceIds: string[] | number[] }) => {
@@ -20,19 +33,17 @@ export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalP
           if (response.status !== 200) {
             throw new Error();
           }
-
           closeModal();
         },
       );
 
       toast.promise(promise, {
         pending: `Running ${jobId}...`,
-        success: `${jobId} started succesfully`,
+        success: `${jobId} started successfully`,
         error: `Failed to start job ${jobId}`,
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [jobId],
+    [jobId, closeModal],
   );
 
   return (
@@ -41,7 +52,8 @@ export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalP
         <Text h3>Execute {jobId}</Text>
       </Modal.Header>
       <Modal.Body>
-        {devices && (
+        <SearchInput value={search} onChange={setSearch} />
+        {filteredDevices && (
           <Table
             aria-label="Devices"
             bordered
@@ -64,7 +76,7 @@ export const ExecuteJobModal = ({ closeModal, devices, jobId }: ExecuteJobModalP
               <Table.Column>Origin</Table.Column>
             </Table.Header>
             <Table.Body>
-              {devices.map((device) => (
+              {filteredDevices.map((device) => (
                 <Table.Row key={`${device.deviceId}`}>
                   <Table.Cell>{device.deviceId}</Table.Cell>
                   <Table.Cell>{device.origin}</Table.Cell>
