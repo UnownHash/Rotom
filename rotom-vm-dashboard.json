@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "9.2.7"
+      "version": "10.1.5"
     },
     {
       "type": "datasource",
@@ -83,6 +83,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -149,8 +150,8 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "Active Workers",
-                  "Total Workers"
+                  "Total Workers",
+                  "Active Workers"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -249,6 +250,7 @@
         "type": "prometheus",
         "uid": "${DS_VICTORIAMETRICS}"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -268,6 +270,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -343,13 +346,13 @@
             "uid": "${DS_VICTORIAMETRICS}"
           },
           "editorMode": "code",
-          "expr": "rotom_workers_active",
+          "expr": "rotom_workers_active{origin=~\"$device\"}",
           "legendFormat": "{{origin}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Workers per Origin",
+      "title": "Workers per Origin / $device",
       "type": "timeseries"
     },
     {
@@ -376,6 +379,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -451,14 +455,14 @@
             "type": "prometheus",
             "uid": "${DS_VICTORIAMETRICS}"
           },
-          "editorMode": "builder",
-          "expr": "rotom_device_memory_free",
+          "editorMode": "code",
+          "expr": "rotom_device_memory_free{origin=~\"$device\"}",
           "legendFormat": "{{origin}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Free Memory",
+      "title": "Free Memory / $device",
       "type": "timeseries"
     },
     {
@@ -485,6 +489,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -560,14 +565,14 @@
             "type": "prometheus",
             "uid": "${DS_VICTORIAMETRICS}"
           },
-          "editorMode": "builder",
-          "expr": "rotom_device_memory_mitm",
+          "editorMode": "code",
+          "expr": "rotom_device_memory_mitm{origin=~\"$device\"}",
           "legendFormat": "{{origin}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "MITM Memory",
+      "title": "MITM Memory / $device",
       "type": "timeseries"
     },
     {
@@ -594,6 +599,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineStyle": {
               "fill": "solid"
@@ -618,8 +624,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -669,23 +674,47 @@
             "type": "prometheus",
             "uid": "${DS_VICTORIAMETRICS}"
           },
-          "editorMode": "builder",
-          "expr": "rotom_device_memory_start",
+          "editorMode": "code",
+          "expr": "rotom_device_memory_start{origin=~\"$device\"}",
           "legendFormat": "{{origin}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Start Memory",
+      "title": "Start Memory / $device",
       "type": "timeseries"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 37,
+  "refresh": "",
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_VICTORIAMETRICS}"
+        },
+        "definition": "label_values(rotom_device_memory_start,origin)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Device",
+        "multi": true,
+        "name": "device",
+        "options": [],
+        "query": {
+          "query": "label_values(rotom_device_memory_start,origin)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-24h",
@@ -695,6 +724,6 @@
   "timezone": "",
   "title": "Rotom",
   "uid": "rotom-vm",
-  "version": 15,
+  "version": 2,
   "weekStart": ""
 }
