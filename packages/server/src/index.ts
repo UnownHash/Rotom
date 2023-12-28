@@ -155,7 +155,13 @@ wssDevice.on('connection', (ws, req) => {
       controller: null,
     };
     if (!unallocatedConnections.includes(workerId)) unallocatedConnections.push(workerId);
-    log.info(`${workerId}: unallocated connections = ${unallocatedConnections.join(',')}`);
+    log.info(
+      `${workerId}: unallocated connections = ${
+        unallocatedConnections.length > 10
+          ? unallocatedConnections.length.toLocaleString()
+          : unallocatedConnections.join(', ')
+      }`,
+    );
   });
 
   deviceConnection.on('disconnected', (deviceWorker: DeviceWorkerConnection) => {
@@ -183,7 +189,13 @@ wssDevice.on('connection', (ws, req) => {
       for (let index = unallocatedConnections.length - 1; index >= 0; index--) {
         if (unallocatedConnections[index] === workerId) unallocatedConnections.splice(index, 1);
       }
-      log.info(`${workerId}: unallocated connections = ${unallocatedConnections.join(',')}`);
+      log.info(
+        `${workerId}: unallocated connections = ${
+          unallocatedConnections.length > 10
+            ? unallocatedConnections.length.toLocaleString()
+            : unallocatedConnections.join(', ')
+        }`,
+      );
     }
   });
 });
