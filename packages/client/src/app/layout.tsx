@@ -14,7 +14,6 @@ const NavbarLink = ({ children, to }: { children?: ReactNode; to: string }): JSX
 
   const location = useLocation();
   const isActive = location.pathname === to;
-  console.log({ location, to, isActive });
 
   return (
     <Navbar.Link

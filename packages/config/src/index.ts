@@ -17,7 +17,7 @@ interface Config {
     save: boolean;
     maxSize: number;
     maxAge: number;
-    debug: boolean;
+    level: string;
     consoleStatus: boolean;
   };
   monitor: {

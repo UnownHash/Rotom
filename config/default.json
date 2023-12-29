@@ -15,7 +15,7 @@
     "save": false,
     "maxSize": 100,
     "maxAge": 14,
-    "debug": false,
+    "level": "info",
     "consoleStatus": false
   },
   "monitor": {
