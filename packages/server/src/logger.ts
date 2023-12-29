@@ -24,7 +24,7 @@ if (config.logging.save) {
 transports.push(new winston.transports.Console());
 
 export const log = winston.createLogger({
-  level: config.logging && config.logging.debug ? 'debug' : 'info',
+  level: config.logging && config.logging.level in winston.config.npm.levels ? config.logging.level : 'info',
   format: winston.format.combine(winston.format.timestamp(), winston.format.label({ label: 'rotom' }), logFormat),
   transports: transports,
 });
