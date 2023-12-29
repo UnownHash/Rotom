@@ -47,6 +47,7 @@ process
   })
   .on('SIGINT', function () {
     console.log('Caught interrupt signal');
+    log.info('Caught interrupt signal');
     process.exit();
   });
 
@@ -168,7 +169,7 @@ wssDevice.on('connection', (ws, req) => {
     const workerId = deviceWorker.workerId as string;
     const instanceNo = deviceWorker.instanceNo;
 
-    console.log(`${workerId}/${instanceNo}: Disconnected; performing disconnection activities`);
+    log.info(`${workerId}/${instanceNo}: Disconnected; performing disconnection activities`);
     if (workerId) {
       const currentConnection = currentConnections[workerId];
       if (currentConnection) {
