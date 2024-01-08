@@ -178,7 +178,7 @@ export class DeviceControlConnection extends EventEmitter {
   }
 
   async getLogcat(): Promise<Buffer> {
-    const { zipData } = await this.executeCommand<{ zipData: string }>('getLogcat', null, 5000);
+    const { zipData } = await this.executeCommand<{ zipData: string }>('getLogcat', null, 30000);
 
     return Buffer.from(zipData, 'base64');
   }
