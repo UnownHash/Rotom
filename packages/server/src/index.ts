@@ -51,6 +51,10 @@ process
     process.exit();
   });
 
+wssDevice.on('error', (err) => {
+  log.error(`Device: ${err}`);
+});
+
 wssDevice.on('connection', (ws, req) => {
   if (config.deviceListener.secret) {
     if (config.deviceListener.secret != req.headers['x-rotom-secret']) {
@@ -223,6 +227,10 @@ function identifyControlChannelFromWorkerId(workerId: string): string | null {
   }
   return null;
 }
+
+wssController.on('error', (err) => {
+  log.error(`CONTROLLER: ${err}`);
+});
 
 wssController.on('connection', (ws, req) => {
   if (config.controllerListener.secret) {
