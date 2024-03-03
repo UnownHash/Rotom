@@ -44,6 +44,9 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
           <Table.Column key="workerId" allowsSorting>
             Worker Id
           </Table.Column>
+          <Table.Column key="workerVersion" allowsSorting>
+            Version
+          </Table.Column>
           <Table.Column key="isAllocated" allowsSorting>
             Is Active
           </Table.Column>
@@ -62,6 +65,7 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
             <Table.Row key={`${worker.workerId}-${index}`}>
               <Table.Cell>{worker.worker.origin}</Table.Cell>
               <Table.Cell>{worker.workerId}</Table.Cell>
+              <Table.Cell>{worker.worker.version}</Table.Cell>
               <Table.Cell>{worker.isAllocated ? '✅' : '❌'}</Table.Cell>
               <Table.Cell>{worker.controller?.workerName}</Table.Cell>
               <Table.Cell>
