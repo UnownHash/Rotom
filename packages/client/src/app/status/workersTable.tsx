@@ -65,8 +65,8 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
             <Table.Row key={`${worker.workerId}-${index}`}>
               <Table.Cell>{worker.worker.origin}</Table.Cell>
               <Table.Cell>{worker.workerId}</Table.Cell>
-              <Table.Cell>{worker.worker.version}</Table.Cell>
               <Table.Cell>{worker.isAllocated ? '✅' : '❌'}</Table.Cell>
+              <Table.Cell>{worker.worker.version}</Table.Cell>
               <Table.Cell>{worker.controller?.workerName}</Table.Cell>
               <Table.Cell>
                 <RelativeTimeLabel timestamp={worker.worker.dateLastMessageReceived} />
