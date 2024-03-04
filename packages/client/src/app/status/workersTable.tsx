@@ -44,11 +44,11 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
           <Table.Column key="workerId" allowsSorting>
             Worker Id
           </Table.Column>
-          <Table.Column key="workerVersion" allowsSorting>
-            Version
-          </Table.Column>
           <Table.Column key="isAllocated" allowsSorting>
             Is Active
+          </Table.Column>
+          <Table.Column key="workerVersion" allowsSorting>
+            Version
           </Table.Column>
           <Table.Column key="scanner.workerName" allowsSorting>
             Scanner Worker Name
