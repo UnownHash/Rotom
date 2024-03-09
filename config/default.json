@@ -19,11 +19,11 @@
     "consoleStatus": false
   },
   "monitor": {
-    "enabled": true,
+    "enabled": false,
     "reboot": false,
     "minMemory": 30000,
     "maxMemStartMultiple": 2,
     "maxMemStartMultipleOverwrite": {},
-    "deviceCooldown": 20
+    "deviceCooldown": 0
   }
 }
