@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Button, Modal, Table, Text } from '@nextui-org/react';
+import { Button, Modal, Table, TableProps, Text } from '@nextui-org/react';
 import { DeviceControlDTO } from '@rotom/connections';
-import { Selection } from '@react-types/shared/src/selection';
 import { toast } from 'react-toastify';
 
 import { SearchInput } from '../status/search';
@@ -13,7 +12,7 @@ interface ExecuteJobModalProps {
 }
 
 export const ExecuteJobModal: React.FC<ExecuteJobModalProps> = ({ closeModal, devices, jobId }) => {
-  const [selectedDevices, setSelectedDevices] = useState<Selection>();
+  const [selectedDevices, setSelectedDevices] = useState<TableProps['selectedKeys']>();
   const [search, setSearch] = useState('');
 
   const filteredDevices = useMemo(() => {
