@@ -19,8 +19,9 @@ export const makeServer = ({ environment = 'test' } = {}) => {
     },
 
     seeds(server) {
-      server.createList('device', 10);
-      server.createList('worker', 50);
+      server.createList('device', 10).forEach((device) => {
+        server.createList('worker', 5, { deviceId: device.deviceId });
+      });
     },
 
     factories: {

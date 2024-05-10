@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { StatusDTO, DeviceControlDTO } from '@rotom/types';
+import { DeviceWithLoadDTO, TransformedStatusDTO } from '@rotom/types';
 import { Table, Dropdown, SortDescriptor } from '@nextui-org/react';
 import { toast } from 'react-toastify';
 
@@ -12,7 +12,7 @@ const kBNumberFormat = new Intl.NumberFormat('en', { style: 'unit', unit: 'kilob
 
 const initialSortDescriptor: SortDescriptor = { column: 'origin', direction: 'ascending' };
 
-export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
+export const DevicesTable = ({ devices }: TransformedStatusDTO): JSX.Element => {
   const [search, setSearch] = useState('');
   const executeAction = useCallback(
     async ({ deviceId, action }: { deviceId: string; action: 'reboot' | 'restart' | 'getLogcat' | 'delete' }) => {
@@ -57,7 +57,7 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
     [],
   );
 
-  const list = useTableSort<DeviceControlDTO>({
+  const list = useTableSort<DeviceWithLoadDTO>({
     items: devices,
     initialSortDescriptor,
   });
@@ -87,7 +87,7 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
           <Table.Column key="origin" allowsSorting>
             Origin
           </Table.Column>
-          <Table.Column key="load" allowsSorting>
+          <Table.Column key="load.percent" allowsSorting width={56}>
             Load
           </Table.Column>
           <Table.Column key="deviceId" allowsSorting>
@@ -118,13 +118,11 @@ export const DevicesTable = ({ devices, workers }: StatusDTO): JSX.Element => {
         </Table.Header>
         <Table.Body loadingState={list.loadingState}>
           {filteredItems.map((device, index) => {
-            const deviceWorkers = workers.filter((worker) => worker.deviceId === device.deviceId);
-
             return (
               <Table.Row key={`${device.deviceId}-${index}`}>
                 <Table.Cell>{device.origin}</Table.Cell>
                 <Table.Cell>
-                  {deviceWorkers.filter((worker) => worker.isAllocated).length}/{deviceWorkers.length}
+                  {device.load.allocated}/{device.load.total}
                 </Table.Cell>
                 <Table.Cell>{device.deviceId}</Table.Cell>
                 <Table.Cell>{device.isAlive ? '✅' : '❌'}</Table.Cell>

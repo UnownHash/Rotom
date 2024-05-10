@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Button, Grid, Loading, Spacer, Text } from '@nextui-org/react';
-import { StatusDTO } from '@rotom/types';
+import { StatusDTO, TransformedStatusDTO } from '@rotom/types';
 import { useCallback, useState } from 'react';
 
 import { StatusCard } from './statusCard';
@@ -10,9 +10,30 @@ import { MemoizedDevicesTable as DevicesTable } from './devicesTable';
 const fetchStatus = (): Promise<StatusDTO> => fetch('/api/status').then((res) => res.json());
 
 export const StatusPage = (): JSX.Element => {
-  const { isLoading, isFetching, error, data, isSuccess } = useQuery<StatusDTO, Error>(['status'], fetchStatus, {
-    refetchInterval: 5000,
-  });
+  const { isLoading, isFetching, error, data, isSuccess } = useQuery<StatusDTO, Error, TransformedStatusDTO>(
+    ['status'],
+    fetchStatus,
+    {
+      refetchInterval: 5000,
+      select: (data) => {
+        const newData = { ...data } as TransformedStatusDTO;
+
+        newData.devices.forEach((device) => {
+          const deviceWorkers = newData.workers.filter((worker) => worker.deviceId === device.deviceId);
+          device.load = {
+            percent: 0,
+            allocated: deviceWorkers.filter((worker) => worker.isAllocated).length,
+            total: deviceWorkers.length,
+          };
+          if (device.load.total) {
+            device.load.percent = (device.load.allocated / device.load.total) * 100;
+          }
+        });
+
+        return newData;
+      },
+    },
+  );
   const [delLoading, setDelLoading] = useState(false);
 
   const handleRemoveDead = useCallback(async () => {
