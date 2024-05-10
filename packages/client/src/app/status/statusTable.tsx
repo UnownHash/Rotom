@@ -15,8 +15,6 @@ export const StatusTable = ({ children, tableLength, rowsPerPage, ...props }: St
     <Table
       bordered
       color="secondary"
-      compact
-      headerLined
       key={`table-${tableLength}`}
       lined
       shadow={false}
@@ -24,8 +22,8 @@ export const StatusTable = ({ children, tableLength, rowsPerPage, ...props }: St
       css={{
         minWidth: '100%',
         '.nextui-table-hidden-row': {
-          '--nextui-space-14': 0,
-          maxHeight: `calc(300px - ${tableLength} * var(--nextui-space-14))`,
+          '--nextui-space-15': 0,
+          maxHeight: `calc(300px - ${tableLength} * var(--nextui-space-15))`,
           display: 'block',
         },
         tfoot: {
