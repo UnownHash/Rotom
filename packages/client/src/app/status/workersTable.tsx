@@ -47,6 +47,9 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
           <Table.Column key="isAllocated" allowsSorting>
             Is Active
           </Table.Column>
+          <Table.Column key="workerVersion" allowsSorting>
+            Version
+          </Table.Column>
           <Table.Column key="scanner.workerName" allowsSorting>
             Scanner Worker Name
           </Table.Column>
@@ -63,6 +66,7 @@ export const WorkersTable = ({ workers }: { workers: StatusDTO['workers'] }): JS
               <Table.Cell>{worker.worker.origin}</Table.Cell>
               <Table.Cell>{worker.workerId}</Table.Cell>
               <Table.Cell>{worker.isAllocated ? '✅' : '❌'}</Table.Cell>
+              <Table.Cell>{worker.worker.version}</Table.Cell>
               <Table.Cell>{worker.controller?.workerName}</Table.Cell>
               <Table.Cell>
                 <RelativeTimeLabel timestamp={worker.worker.dateLastMessageReceived} />
