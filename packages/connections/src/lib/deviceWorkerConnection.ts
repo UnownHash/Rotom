@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter, once } from 'events';
 import { Logger } from 'winston';
 import { WebSocket } from 'ws';
 
@@ -101,21 +101,45 @@ export class DeviceWorkerConnection extends EventEmitter {
   }
 
   heartbeat() {
-    this.isAlive = true;
+    //this.isAlive = true;
+    this.emit('isAlive', true);
   }
 
-  checkHeartbeat() {
+  async checkHeartbeat() {
     if (!this.isAlive) {
       // Pong has not been received in last interval seconds
-      this.log.warn(`${this.workerId}/${this.instanceNo}: MITM - No response to ping - forcing disconnect`);
+      this.log.warn(`${this.deviceId}/${this.instanceNo}: DEVICE - No response to ping - forcing disconnect`);
       clearInterval(this.heartbeatHandle);
       this.ws.terminate();
-
       return;
     }
 
-    this.isAlive = false;
+    //this.isAlive = false;
     this.ws.ping();
+    let isAlive = false;
+    try {
+      // eslint-disable-next-line no-async-promise-executor
+      isAlive = await new Promise<boolean>(async (resolve, reject) => {
+        // Create a timeout promise
+        const timeout = setTimeout(() => {
+          reject("Timeout - 'ping' event did not occur within the time limit.");
+        }, 15000);
+        try {
+          const [status] = await once(this, 'isAlive');
+          clearTimeout(timeout);
+          resolve(status);
+        } catch (err) {
+          clearTimeout(timeout);
+          reject(err);
+        }
+      });
+    } catch (err) {
+      // Pong has not been received in last interval seconds
+      this.log.warn(`${this.deviceId}/${this.instanceNo}: DEVICE - No response to ping - forcing disconnect: ${err}`);
+      clearInterval(this.heartbeatHandle);
+      this.ws.terminate();
+    }
+    this.isAlive = isAlive;
   }
 
   disconnected() {
