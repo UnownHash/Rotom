@@ -22,6 +22,7 @@ export class DeviceWorkerConnection extends EventEmitter {
   origin?: string;
   version?: string;
   ws: WebSocket;
+  heartbeatCheckStatus: boolean;
   isAlive: boolean;
   instanceNo: number;
   heartbeatHandle: NodeJS.Timer;
@@ -33,6 +34,7 @@ export class DeviceWorkerConnection extends EventEmitter {
     this.ws = ws;
     this.log = log;
     this.init = true;
+    this.heartbeatCheckStatus = true;
     this.isAlive = true;
     this.origin = '';
     this.traceMessages = false;
@@ -101,11 +103,11 @@ export class DeviceWorkerConnection extends EventEmitter {
   }
 
   heartbeat() {
-    this.isAlive = true;
+    this.heartbeatCheckStatus = true;
   }
 
   checkHeartbeat() {
-    if (!this.isAlive) {
+    if (!this.heartbeatCheckStatus) {
       // Pong has not been received in last interval seconds
       this.log.warn(`${this.workerId}/${this.instanceNo}: MITM - No response to ping - forcing disconnect`);
       clearInterval(this.heartbeatHandle);
@@ -114,12 +116,13 @@ export class DeviceWorkerConnection extends EventEmitter {
       return;
     }
 
-    this.isAlive = false;
+    this.heartbeatCheckStatus = false;
     this.ws.ping();
   }
 
   disconnected() {
-    this.isAlive = false;
+    this.heartbeatCheckStatus = false;
+    this.isAlive = true;
     clearInterval(this.heartbeatHandle);
 
     this.emit('disconnected', this);
@@ -131,6 +134,7 @@ export class DeviceWorkerConnection extends EventEmitter {
       dateLastMessageSent: this.dateLastMessageSent,
       init: this.init,
       instanceNo: this.instanceNo,
+      heartbeatCheckStatus: this.heartbeatCheckStatus,
       isAlive: this.isAlive,
       noMessagesReceived: this.noMessagesReceived,
       noMessagesSent: this.noMessagesSent,

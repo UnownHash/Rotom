@@ -40,6 +40,7 @@ export class DeviceControlConnection extends EventEmitter {
   version?: string;
   publicIp?: string;
   ws: WebSocket;
+  heartbeatCheckStatus: boolean;
   isAlive: boolean;
   instanceNo: number;
   heartbeatHandle: NodeJS.Timer;
@@ -52,6 +53,7 @@ export class DeviceControlConnection extends EventEmitter {
     this.log = log;
     this.ws = ws;
     this.init = true;
+    this.heartbeatCheckStatus = true;
     this.isAlive = true;
     this.origin = '';
 
@@ -125,11 +127,11 @@ export class DeviceControlConnection extends EventEmitter {
   }
 
   heartbeat() {
-    this.isAlive = true;
+    this.heartbeatCheckStatus = true;
   }
 
   checkHeartbeat() {
-    if (!this.isAlive) {
+    if (!this.heartbeatCheckStatus) {
       // Pong has not been received in last interval seconds
       this.log.warn(`${this.deviceId}/${this.instanceNo}: DEVICE - No response to ping - forcing disconnect`);
       clearInterval(this.heartbeatHandle);
@@ -138,11 +140,12 @@ export class DeviceControlConnection extends EventEmitter {
       return;
     }
 
-    this.isAlive = false;
+    this.heartbeatCheckStatus = false;
     this.ws.ping();
   }
 
   disconnected() {
+    this.heartbeatCheckStatus = false;
     this.isAlive = false;
     clearInterval(this.heartbeatHandle);
 
@@ -216,6 +219,7 @@ export class DeviceControlConnection extends EventEmitter {
       deviceId: this.deviceId,
       init: this.init,
       instanceNo: this.instanceNo,
+      heartbeatCheckStatus: this.heartbeatCheckStatus,
       isAlive: this.isAlive,
       lastMemory: this.lastMemory,
       nextId: this.nextId,
