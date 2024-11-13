@@ -44,7 +44,7 @@ export class ControllerConnection extends EventEmitter {
     this._ws_close_handler = () => this.#handleControllerDisconnection();
     ws.on('message', this._ws_message_handler);
     ws.on('close', this._ws_close_handler);
-    ws.on('pong', () => this.heatbeatReceived());
+    ws.on('pong', () => this.emit('isAlive', true));
 
     this.deviceWorkerConnection = deviceWorkerConnection;
     this._device_message_handler = (data: ArrayBuffer) => this.#handleMitmMessage(data);
@@ -154,11 +154,6 @@ export class ControllerConnection extends EventEmitter {
   #disconnectFromDeviceWebsocket() {
     this.deviceWorkerConnection.removeListener('received', this._device_message_handler);
     this.deviceWorkerConnection.removeListener('disconnected', this._device_disconnect_handler);
-  }
-
-  heatbeatReceived() {
-    //this.isAlive = true;
-    this.emit('isAlive', true);
   }
 
   async checkHeartbeat() {
