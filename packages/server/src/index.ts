@@ -51,7 +51,14 @@ process
     process.exit();
   });
 
+wssDevice.on('error', (err) => {
+  log.error(`Device websocket error:`, err);
+});
+
 wssDevice.on('connection', (ws, req) => {
+  ws.on('error', (err) => {
+    log.error(`Device connection error:`, err);
+  });
   if (config.deviceListener.secret) {
     if (config.deviceListener.secret != req.headers['x-rotom-secret']) {
       log.info(`Device: New connection from ${req.socket.remoteAddress} url ${req.url} - incorrect secret, rejecting`);
@@ -224,7 +231,14 @@ function identifyControlChannelFromWorkerId(workerId: string): string | null {
   return null;
 }
 
+wssController.on('error', (err) => {
+  log.error(`CONTROLLER websocket error:`, err);
+});
+
 wssController.on('connection', (ws, req) => {
+  ws.on('error', (err) => {
+    log.error(`CONTROLLER connection error:`, err);
+  });
   if (config.controllerListener.secret) {
     if (config.controllerListener.secret != req.headers['x-rotom-secret']) {
       log.info(`CONTROLLER: New connection from ${req.socket.remoteAddress} - incorrect secret, rejecting`);
