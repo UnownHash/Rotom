@@ -46,7 +46,7 @@ export class DeviceWorkerConnection extends EventEmitter {
 
     ws.on('message', (data: ArrayBuffer) => this.received(data));
     ws.on('close', () => this.disconnected());
-    ws.on('pong', () => this.heartbeat());
+    ws.on('pong', () => this.heatbeatReceived());
 
     this.heartbeatHandle = setInterval(() => this.checkHeartbeat(), 30000);
   }
@@ -100,7 +100,7 @@ export class DeviceWorkerConnection extends EventEmitter {
     this.ws.send(message, { binary: true });
   }
 
-  heartbeat() {
+  heatbeatReceived() {
     //this.isAlive = true;
     this.emit('isAlive', true);
   }
