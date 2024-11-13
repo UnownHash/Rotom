@@ -145,10 +145,16 @@ export class DeviceControlConnection extends EventEmitter {
     try {
       // eslint-disable-next-line no-async-promise-executor
       isAlive = await new Promise<boolean>(async (resolve, reject) => {
+        // Create a timeout promise
+        const timeout = setTimeout(() => {
+          reject("Timeout - 'ping' event did not occur within the time limit.");
+        }, 15000);
         try {
           const [status] = await once(this, 'isAlive');
+          clearTimeout(timeout);
           resolve(status);
         } catch (err) {
+          clearTimeout(timeout);
           reject(err);
         }
       });
