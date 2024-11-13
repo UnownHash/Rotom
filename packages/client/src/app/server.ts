@@ -38,6 +38,9 @@ export const makeServer = ({ environment = 'test' } = {}) => {
         isAlive() {
           return faker.datatype.boolean();
         },
+        heartbeatCheckStatus() {
+          return faker.datatype.boolean();
+        },
         lastMemory() {
           return {
             memFree: faker.datatype.number(),
@@ -69,6 +72,7 @@ export const makeServer = ({ environment = 'test' } = {}) => {
             init: faker.datatype.boolean(),
             instanceNo: 0,
             isAlive: faker.datatype.boolean(),
+            heartbeatCheckStatus: faker.datatype.boolean(),
             noMessagesReceived: 1,
             noMessagesSent: 1,
             origin: 'none',

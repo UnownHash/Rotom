@@ -26,6 +26,7 @@ export class ControllerConnection extends EventEmitter {
   dateLastMessageSent: number;
   instanceNo: number;
   workerName: string;
+  heartbeatCheckStatus: boolean;
   isAlive: boolean;
   loginListener: number;
 
@@ -34,6 +35,7 @@ export class ControllerConnection extends EventEmitter {
     this.ws = ws;
     this.log = log;
     this.dateLastMessageSent = Date.now();
+    this.heartbeatCheckStatus = true;
     this.isAlive = true;
     this.workerName = '<unknown>';
 
@@ -68,6 +70,7 @@ export class ControllerConnection extends EventEmitter {
    * Handle Mitm device disconnection
    */
   #handleMitmDisconnection() {
+    this.isAlive = false;
     this.disconnect();
   }
 
@@ -128,6 +131,7 @@ export class ControllerConnection extends EventEmitter {
   }
 
   #handleControllerDisconnection() {
+    this.heartbeatCheckStatus = false;
     this.isAlive = false;
     clearInterval(this.heartbeatHandle);
 
@@ -157,11 +161,11 @@ export class ControllerConnection extends EventEmitter {
   }
 
   heartbeat() {
-    this.isAlive = true;
+    this.heartbeatCheckStatus = true;
   }
 
   checkHeartbeat() {
-    if (!this.isAlive) {
+    if (!this.heartbeatCheckStatus) {
       // Pong has not been received in last interval seconds
       this.log.warn(
         `${this.workerName}/${this.instanceNo}->${this.workerId}: Scanner - No response to ping - forcing disconnect`,
@@ -182,7 +186,7 @@ export class ControllerConnection extends EventEmitter {
       return;
     }
 
-    this.isAlive = false;
+    this.heartbeatCheckStatus = false;
     this.ws.ping();
   }
 
@@ -190,6 +194,7 @@ export class ControllerConnection extends EventEmitter {
     return {
       dateLastMessageSent: this.dateLastMessageSent,
       instanceNo: this.instanceNo,
+      heartbeatCheckStatus: this.heartbeatCheckStatus,
       isAlive: this.isAlive,
       loginListener: this.loginListener,
       origin: this.origin,
