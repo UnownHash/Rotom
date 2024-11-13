@@ -38,6 +38,7 @@
     "config": "^3.3.7",
     "core-js": "^3.6.5",
     "fastify": "^4.2.0",
+    "long": "^5.2.3",
     "prom-client": "^14.2.0",
     "protobufjs": "^7.2.5",
     "react": "^18.2.0",
