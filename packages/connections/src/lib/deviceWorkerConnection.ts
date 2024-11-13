@@ -122,7 +122,7 @@ export class DeviceWorkerConnection extends EventEmitter {
 
   disconnected() {
     this.heartbeatCheckStatus = false;
-    this.isAlive = true;
+    this.isAlive = false;
     clearInterval(this.heartbeatHandle);
 
     this.emit('disconnected', this);
