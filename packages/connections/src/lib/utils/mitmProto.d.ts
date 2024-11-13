@@ -1,4 +1,5 @@
 import * as $protobuf from "protobufjs";
+import Long = require("long");
 /** Namespace RotomProtos. */
 export namespace RotomProtos {
 
@@ -255,7 +256,11 @@ export namespace RotomProtos {
             /** LoginSource enum. */
             enum LoginSource {
                 UNSET = 0,
-                PTC = 1
+                PTC = 1,
+                PTC_OAUTH = 2,
+                FACEBOOK = 3,
+                GOOGLE = 4,
+                SUPER_AWESOME = 5
             }
         }
 
@@ -495,6 +500,9 @@ export namespace RotomProtos {
 
         /** MitmResponse rpcResponse */
         rpcResponse?: (RotomProtos.MitmResponse.IRpcResponse|null);
+
+        /** MitmResponse mitmError */
+        mitmError?: (string|null);
     }
 
     /** Represents a MitmResponse. */
@@ -517,6 +525,9 @@ export namespace RotomProtos {
 
         /** MitmResponse rpcResponse. */
         public rpcResponse?: (RotomProtos.MitmResponse.IRpcResponse|null);
+
+        /** MitmResponse mitmError. */
+        public mitmError: string;
 
         /** MitmResponse payload. */
         public payload?: ("loginResponse"|"rpcResponse");
@@ -606,10 +617,9 @@ export namespace RotomProtos {
             UNSET = 0,
             SUCCESS = 200,
             ERROR_UNKNOWN = 500,
-            ERROR_GAME_NOT_READY = 501,
-            ERROR_LOGIN_IN_PROGRESS = 502,
-            ERROR_TOKEN_REJECTED = 503,
-            ERROR_NOT_LOGGED_IN = 504
+            ERROR_RETRY_LATER = 501,
+            ERROR_WORKER_STOPPED = 502,
+            ERROR_RECONNECT = 503
         }
 
         /** Properties of a LoginResponse. */
@@ -623,6 +633,9 @@ export namespace RotomProtos {
 
             /** LoginResponse supportsCompression */
             supportsCompression?: (boolean|null);
+
+            /** LoginResponse useragent */
+            useragent?: (string|null);
         }
 
         /** Represents a LoginResponse. */
@@ -642,6 +655,9 @@ export namespace RotomProtos {
 
             /** LoginResponse supportsCompression. */
             public supportsCompression: boolean;
+
+            /** LoginResponse useragent. */
+            public useragent: string;
 
             /**
              * Creates a new LoginResponse instance using the specified properties.
@@ -1100,6 +1116,8 @@ export namespace RotomProtos {
         RPC_STATUS_ACCESS_SUSPENDED = 16,
         RPC_STATUS_DEVICE_INCOMPATIBLE = 17,
         RPC_STATUS_ACCESS_RATE_LIMITED = 18,
+        RPC_STATUS_GOOGLE_PLAY_NOT_READY = 19,
+        RPC_STATUS_LOGIN_ERROR_BAIL = 20,
         RPC_STATUS_MITM_DISALLOWED_REQUEST = 99
     }
 }

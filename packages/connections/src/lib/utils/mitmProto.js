@@ -565,6 +565,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         return "source: enum value expected";
                     case 0:
                     case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
                         break;
                     }
                 if (message.tokenProto != null && message.hasOwnProperty("tokenProto"))
@@ -607,6 +611,22 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 case "PTC":
                 case 1:
                     message.source = 1;
+                    break;
+                case "PTC_OAUTH":
+                case 2:
+                    message.source = 2;
+                    break;
+                case "FACEBOOK":
+                case 3:
+                    message.source = 3;
+                    break;
+                case "GOOGLE":
+                case 4:
+                    message.source = 4;
+                    break;
+                case "SUPER_AWESOME":
+                case 5:
+                    message.source = 5;
                     break;
                 }
                 if (object.tokenProto != null)
@@ -692,11 +712,19 @@ export const RotomProtos = $root.RotomProtos = (() => {
              * @enum {number}
              * @property {number} UNSET=0 UNSET value
              * @property {number} PTC=1 PTC value
+             * @property {number} PTC_OAUTH=2 PTC_OAUTH value
+             * @property {number} FACEBOOK=3 FACEBOOK value
+             * @property {number} GOOGLE=4 GOOGLE value
+             * @property {number} SUPER_AWESOME=5 SUPER_AWESOME value
              */
             LoginRequest.LoginSource = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNSET"] = 0;
                 values[valuesById[1] = "PTC"] = 1;
+                values[valuesById[2] = "PTC_OAUTH"] = 2;
+                values[valuesById[3] = "FACEBOOK"] = 3;
+                values[valuesById[4] = "GOOGLE"] = 4;
+                values[valuesById[5] = "SUPER_AWESOME"] = 5;
                 return values;
             })();
 
@@ -1247,6 +1275,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
          * @property {RotomProtos.MitmResponse.Status|null} [status] MitmResponse status
          * @property {RotomProtos.MitmResponse.ILoginResponse|null} [loginResponse] MitmResponse loginResponse
          * @property {RotomProtos.MitmResponse.IRpcResponse|null} [rpcResponse] MitmResponse rpcResponse
+         * @property {string|null} [mitmError] MitmResponse mitmError
          */
 
         /**
@@ -1296,6 +1325,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
          */
         MitmResponse.prototype.rpcResponse = null;
 
+        /**
+         * MitmResponse mitmError.
+         * @member {string} mitmError
+         * @memberof RotomProtos.MitmResponse
+         * @instance
+         */
+        MitmResponse.prototype.mitmError = "";
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
@@ -1342,6 +1379,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 $root.RotomProtos.MitmResponse.LoginResponse.encode(message.loginResponse, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
             if (message.rpcResponse != null && Object.hasOwnProperty.call(message, "rpcResponse"))
                 $root.RotomProtos.MitmResponse.RpcResponse.encode(message.rpcResponse, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            if (message.mitmError != null && Object.hasOwnProperty.call(message, "mitmError"))
+                writer.uint32(/* id 100, wireType 2 =*/802).string(message.mitmError);
             return writer;
         };
 
@@ -1390,6 +1429,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     }
                 case 4: {
                         message.rpcResponse = $root.RotomProtos.MitmResponse.RpcResponse.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 100: {
+                        message.mitmError = reader.string();
                         break;
                     }
                 default:
@@ -1441,7 +1484,6 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 case 501:
                 case 502:
                 case 503:
-                case 504:
                     break;
                 }
             if (message.loginResponse != null && message.hasOwnProperty("loginResponse")) {
@@ -1462,6 +1504,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         return "rpcResponse." + error;
                 }
             }
+            if (message.mitmError != null && message.hasOwnProperty("mitmError"))
+                if (!$util.isString(message.mitmError))
+                    return "mitmError: string expected";
             return null;
         };
 
@@ -1498,21 +1543,17 @@ export const RotomProtos = $root.RotomProtos = (() => {
             case 500:
                 message.status = 500;
                 break;
-            case "ERROR_GAME_NOT_READY":
+            case "ERROR_RETRY_LATER":
             case 501:
                 message.status = 501;
                 break;
-            case "ERROR_LOGIN_IN_PROGRESS":
+            case "ERROR_WORKER_STOPPED":
             case 502:
                 message.status = 502;
                 break;
-            case "ERROR_TOKEN_REJECTED":
+            case "ERROR_RECONNECT":
             case 503:
                 message.status = 503;
-                break;
-            case "ERROR_NOT_LOGGED_IN":
-            case 504:
-                message.status = 504;
                 break;
             }
             if (object.loginResponse != null) {
@@ -1525,6 +1566,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     throw TypeError(".RotomProtos.MitmResponse.rpcResponse: object expected");
                 message.rpcResponse = $root.RotomProtos.MitmResponse.RpcResponse.fromObject(object.rpcResponse);
             }
+            if (object.mitmError != null)
+                message.mitmError = String(object.mitmError);
             return message;
         };
 
@@ -1544,6 +1587,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
             if (options.defaults) {
                 object.id = 0;
                 object.status = options.enums === String ? "UNSET" : 0;
+                object.mitmError = "";
             }
             if (message.id != null && message.hasOwnProperty("id"))
                 object.id = message.id;
@@ -1559,6 +1603,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 if (options.oneofs)
                     object.payload = "rpcResponse";
             }
+            if (message.mitmError != null && message.hasOwnProperty("mitmError"))
+                object.mitmError = message.mitmError;
             return object;
         };
 
@@ -1595,20 +1641,18 @@ export const RotomProtos = $root.RotomProtos = (() => {
          * @property {number} UNSET=0 UNSET value
          * @property {number} SUCCESS=200 SUCCESS value
          * @property {number} ERROR_UNKNOWN=500 ERROR_UNKNOWN value
-         * @property {number} ERROR_GAME_NOT_READY=501 ERROR_GAME_NOT_READY value
-         * @property {number} ERROR_LOGIN_IN_PROGRESS=502 ERROR_LOGIN_IN_PROGRESS value
-         * @property {number} ERROR_TOKEN_REJECTED=503 ERROR_TOKEN_REJECTED value
-         * @property {number} ERROR_NOT_LOGGED_IN=504 ERROR_NOT_LOGGED_IN value
+         * @property {number} ERROR_RETRY_LATER=501 ERROR_RETRY_LATER value
+         * @property {number} ERROR_WORKER_STOPPED=502 ERROR_WORKER_STOPPED value
+         * @property {number} ERROR_RECONNECT=503 ERROR_RECONNECT value
          */
         MitmResponse.Status = (function() {
             const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNSET"] = 0;
             values[valuesById[200] = "SUCCESS"] = 200;
             values[valuesById[500] = "ERROR_UNKNOWN"] = 500;
-            values[valuesById[501] = "ERROR_GAME_NOT_READY"] = 501;
-            values[valuesById[502] = "ERROR_LOGIN_IN_PROGRESS"] = 502;
-            values[valuesById[503] = "ERROR_TOKEN_REJECTED"] = 503;
-            values[valuesById[504] = "ERROR_NOT_LOGGED_IN"] = 504;
+            values[valuesById[501] = "ERROR_RETRY_LATER"] = 501;
+            values[valuesById[502] = "ERROR_WORKER_STOPPED"] = 502;
+            values[valuesById[503] = "ERROR_RECONNECT"] = 503;
             return values;
         })();
 
@@ -1621,6 +1665,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
              * @property {string|null} [workerId] LoginResponse workerId
              * @property {RotomProtos.AuthStatus|null} [status] LoginResponse status
              * @property {boolean|null} [supportsCompression] LoginResponse supportsCompression
+             * @property {string|null} [useragent] LoginResponse useragent
              */
 
             /**
@@ -1663,6 +1708,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
             LoginResponse.prototype.supportsCompression = false;
 
             /**
+             * LoginResponse useragent.
+             * @member {string} useragent
+             * @memberof RotomProtos.MitmResponse.LoginResponse
+             * @instance
+             */
+            LoginResponse.prototype.useragent = "";
+
+            /**
              * Creates a new LoginResponse instance using the specified properties.
              * @function create
              * @memberof RotomProtos.MitmResponse.LoginResponse
@@ -1692,6 +1745,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     writer.uint32(/* id 2, wireType 0 =*/16).int32(message.status);
                 if (message.supportsCompression != null && Object.hasOwnProperty.call(message, "supportsCompression"))
                     writer.uint32(/* id 3, wireType 0 =*/24).bool(message.supportsCompression);
+                if (message.useragent != null && Object.hasOwnProperty.call(message, "useragent"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.useragent);
                 return writer;
             };
 
@@ -1736,6 +1791,10 @@ export const RotomProtos = $root.RotomProtos = (() => {
                         }
                     case 3: {
                             message.supportsCompression = reader.bool();
+                            break;
+                        }
+                    case 4: {
+                            message.useragent = reader.string();
                             break;
                         }
                     default:
@@ -1797,6 +1856,9 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 if (message.supportsCompression != null && message.hasOwnProperty("supportsCompression"))
                     if (typeof message.supportsCompression !== "boolean")
                         return "supportsCompression: boolean expected";
+                if (message.useragent != null && message.hasOwnProperty("useragent"))
+                    if (!$util.isString(message.useragent))
+                        return "useragent: string expected";
                 return null;
             };
 
@@ -1872,6 +1934,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 }
                 if (object.supportsCompression != null)
                     message.supportsCompression = Boolean(object.supportsCompression);
+                if (object.useragent != null)
+                    message.useragent = String(object.useragent);
                 return message;
             };
 
@@ -1892,6 +1956,7 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     object.workerId = "";
                     object.status = options.enums === String ? "AUTH_STATUS_UNSET" : 0;
                     object.supportsCompression = false;
+                    object.useragent = "";
                 }
                 if (message.workerId != null && message.hasOwnProperty("workerId"))
                     object.workerId = message.workerId;
@@ -1899,6 +1964,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     object.status = options.enums === String ? $root.RotomProtos.AuthStatus[message.status] === undefined ? message.status : $root.RotomProtos.AuthStatus[message.status] : message.status;
                 if (message.supportsCompression != null && message.hasOwnProperty("supportsCompression"))
                     object.supportsCompression = message.supportsCompression;
+                if (message.useragent != null && message.hasOwnProperty("useragent"))
+                    object.useragent = message.useragent;
                 return object;
             };
 
@@ -2103,6 +2170,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
                     case 16:
                     case 17:
                     case 18:
+                    case 19:
+                    case 20:
                     case 99:
                         break;
                     }
@@ -2208,6 +2277,14 @@ export const RotomProtos = $root.RotomProtos = (() => {
                 case "RPC_STATUS_ACCESS_RATE_LIMITED":
                 case 18:
                     message.rpcStatus = 18;
+                    break;
+                case "RPC_STATUS_GOOGLE_PLAY_NOT_READY":
+                case 19:
+                    message.rpcStatus = 19;
+                    break;
+                case "RPC_STATUS_LOGIN_ERROR_BAIL":
+                case 20:
+                    message.rpcStatus = 20;
                     break;
                 case "RPC_STATUS_MITM_DISALLOWED_REQUEST":
                 case 99:
@@ -2920,6 +2997,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
      * @property {number} RPC_STATUS_ACCESS_SUSPENDED=16 RPC_STATUS_ACCESS_SUSPENDED value
      * @property {number} RPC_STATUS_DEVICE_INCOMPATIBLE=17 RPC_STATUS_DEVICE_INCOMPATIBLE value
      * @property {number} RPC_STATUS_ACCESS_RATE_LIMITED=18 RPC_STATUS_ACCESS_RATE_LIMITED value
+     * @property {number} RPC_STATUS_GOOGLE_PLAY_NOT_READY=19 RPC_STATUS_GOOGLE_PLAY_NOT_READY value
+     * @property {number} RPC_STATUS_LOGIN_ERROR_BAIL=20 RPC_STATUS_LOGIN_ERROR_BAIL value
      * @property {number} RPC_STATUS_MITM_DISALLOWED_REQUEST=99 RPC_STATUS_MITM_DISALLOWED_REQUEST value
      */
     RotomProtos.RpcStatus = (function() {
@@ -2942,6 +3021,8 @@ export const RotomProtos = $root.RotomProtos = (() => {
         values[valuesById[16] = "RPC_STATUS_ACCESS_SUSPENDED"] = 16;
         values[valuesById[17] = "RPC_STATUS_DEVICE_INCOMPATIBLE"] = 17;
         values[valuesById[18] = "RPC_STATUS_ACCESS_RATE_LIMITED"] = 18;
+        values[valuesById[19] = "RPC_STATUS_GOOGLE_PLAY_NOT_READY"] = 19;
+        values[valuesById[20] = "RPC_STATUS_LOGIN_ERROR_BAIL"] = 20;
         values[valuesById[99] = "RPC_STATUS_MITM_DISALLOWED_REQUEST"] = 99;
         return values;
     })();
