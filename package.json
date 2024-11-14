@@ -15,9 +15,6 @@
     "dev:mock": "NODE_ENV=development NX_ENABLE_MOCKS=1 nx run-many --target=dev --all",
     "clear-cache": "nx clear-cache"
   },
-  "exports": {
-    "./package.json": "./package.json"
-  },
   "volta": {
     "node": "18.18.2"
   },
