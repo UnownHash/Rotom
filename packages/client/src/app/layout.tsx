@@ -1,6 +1,7 @@
 import { Container, Navbar, styled, Text } from '@nextui-org/react';
 import { FC, ReactNode, MouseEvent } from 'react';
 import { useHref, useLinkClickHandler, useLocation } from 'react-router-dom';
+import { version } from '../../../../package.json';
 
 export const Box = styled('div', {
   boxSizing: 'border-box',
@@ -34,7 +35,7 @@ export const Layout: FC<{ children?: ReactNode }> = ({ children }) => {
       <Navbar isCompact isBordered>
         <Navbar.Brand>
           <Text b color="inherit">
-            Rotom
+            Rotom v{version}
           </Text>
         </Navbar.Brand>
         <Navbar.Content variant="underline">
