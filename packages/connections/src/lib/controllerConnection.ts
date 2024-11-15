@@ -11,7 +11,7 @@ let instanceNo = 0;
 
 export type ControllerConnectionDTO = Omit<
   DTO<ControllerConnection>,
-  'ws' | 'log' | 'heartbeatHandle' | 'deviceWorkerConnection'
+  typeof EventEmitter.captureRejectionSymbol | 'ws' | 'log' | 'heartbeatHandle' | 'deviceWorkerConnection'
 >;
 
 export class ControllerConnection extends EventEmitter {
@@ -22,7 +22,7 @@ export class ControllerConnection extends EventEmitter {
   deviceWorkerConnection: DeviceWorkerConnection;
   ws: WebSocket;
   log: Logger;
-  heartbeatHandle: NodeJS.Timer;
+  heartbeatHandle: NodeJS.Timeout;
   dateLastMessageSent: number;
   instanceNo: number;
   workerName: string;
