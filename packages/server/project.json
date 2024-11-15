@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/server/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/webpack:webpack",
@@ -13,7 +14,8 @@
         "tsConfig": "packages/server/tsconfig.app.json",
         "assets": [],
         "compiler": "tsc",
-        "target": "node"
+        "target": "node",
+        "webpackConfig": "packages/server/webpack.config.js"
       },
       "configurations": {
         "production": {
@@ -31,20 +33,14 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["packages/server/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint"
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/packages/server"],
       "options": {
-        "jestConfig": "packages/server/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "packages/server/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }
