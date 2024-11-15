@@ -37,3 +37,5 @@ docker-compose.yml
 Thumbs.db
 
 .nx/cache
+.nx/workspace-data
+migrations.json

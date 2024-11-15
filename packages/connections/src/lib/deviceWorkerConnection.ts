@@ -8,7 +8,10 @@ import WelcomeMessage = RotomProtos.WelcomeMessage;
 
 let instanceNo = 0;
 
-export type DeviceWorkerDTO = Omit<DTO<DeviceWorkerConnection>, 'ws' | 'log' | 'heartbeatHandle'>;
+export type DeviceWorkerDTO = Omit<
+  DTO<DeviceWorkerConnection>,
+  typeof EventEmitter.captureRejectionSymbol | 'ws' | 'log' | 'heartbeatHandle'
+>;
 
 export class DeviceWorkerConnection extends EventEmitter {
   workerId?: string;
@@ -25,7 +28,7 @@ export class DeviceWorkerConnection extends EventEmitter {
   heartbeatCheckStatus: boolean;
   isAlive: boolean;
   instanceNo: number;
-  heartbeatHandle: NodeJS.Timer;
+  heartbeatHandle: NodeJS.Timeout;
   log: Logger;
   traceMessages: boolean;
 

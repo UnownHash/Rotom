@@ -19,7 +19,10 @@ class Deferred {
   }
 }
 
-export type DeviceControlDTO = Omit<DTO<DeviceControlConnection>, 'ws' | 'log' | 'heartbeatHandle'>;
+export type DeviceControlDTO = Omit<
+  DTO<DeviceControlConnection>,
+  typeof EventEmitter.captureRejectionSymbol | 'ws' | 'log' | 'heartbeatHandle'
+>;
 
 interface MemoryStatus {
   memFree: number;
@@ -43,7 +46,7 @@ export class DeviceControlConnection extends EventEmitter {
   heartbeatCheckStatus: boolean;
   isAlive: boolean;
   instanceNo: number;
-  heartbeatHandle: NodeJS.Timer;
+  heartbeatHandle: NodeJS.Timeout;
   nextId: number;
   private responses: any;
   lastMemory: MemoryStatus;
