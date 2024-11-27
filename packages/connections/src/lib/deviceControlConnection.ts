@@ -161,7 +161,9 @@ export class DeviceControlConnection extends EventEmitter {
     //< {"id":7,"status":200,"body":{"memFree":123, ...}}
 
     const memory = await this.executeCommand<MemoryStatus>('getMemoryUsage', null, 5000);
-    this.lastMemory = memory; // spy on result
+    if (typeof memory === 'object') {
+      this.lastMemory = memory; // spy on result
+    }
     return memory;
   }
 
