@@ -2,7 +2,7 @@
 
 /dist
 /coverage
-/packages/connections/src/lib/utils/mitmProto.d.ts
+/packages/connections/src/lib/utils/mitmProto*
 
 /.nx/cache
 /.nx/workspace-data
