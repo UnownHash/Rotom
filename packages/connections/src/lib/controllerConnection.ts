@@ -11,7 +11,7 @@ let instanceNo = 0;
 
 export type ControllerConnectionDTO = Omit<
   DTO<ControllerConnection>,
-  typeof EventEmitter.captureRejectionSymbol | 'ws' | 'log' | 'heartbeatHandle' | 'deviceWorkerConnection'
+  'ws' | 'log' | 'heartbeatHandle' | 'deviceWorkerConnection'
 >;
 
 export class ControllerConnection extends EventEmitter {
