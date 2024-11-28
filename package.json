@@ -12,7 +12,7 @@
     "dev:server": "nx run server:dev",
     "lint": "nx run-many --target=lint --all",
     "start": "node dist/packages/server/main.js",
-    "dev:mock": "NODE_ENV=development NX_ENABLE_MOCKS=1 nx run-many --target=dev --all",
+    "dev:mock": "NODE_ENV=development NX_PUBLIC_ENABLE_MOCKS=1 nx run-many --target=dev --all",
     "clear-cache": "nx clear-cache"
   },
   "volta": {
