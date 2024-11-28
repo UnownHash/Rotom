@@ -16,7 +16,10 @@
     "clear-cache": "nx clear-cache"
   },
   "volta": {
-    "node": "18.18.2"
+    "node": "20.18.1"
+  },
+  "engines": {
+    "node": ">=20.8"
   },
   "prettier": {
     "singleQuote": true,
