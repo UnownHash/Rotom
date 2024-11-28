@@ -78,40 +78,44 @@ export class DeviceControlConnection extends EventEmitter {
   received(message: string) {
     this.log.debug(`${this.deviceId}: <MITMC ${message}`);
 
+    let msg;
+    try {
+      msg = JSON.parse(message);
+    } catch {
+      // Do nothing
+    }
+
+    if (typeof msg !== 'object') {
+      this.log.error(`Device /control - error decoding message, disconnecting`);
+      this.ws.close();
+      return;
+    }
+
     this.dateLastMessageReceived = Date.now();
     this.dateLastMessageSent = Date.now();
 
     if (this.init) {
-      try {
-        const id = JSON.parse(message);
-
-        this.deviceId = id.deviceId;
-        this.version = id.version;
-        this.origin = id.origin;
-        this.publicIp = id.publicIp;
-        this.noMessagesSent = 0;
-        this.noMessagesReceived = 0;
-        this.responses = {};
-      } catch (e) {
-        this.log.error(`Device /control - error decoding welcome message, disconnecting`);
-        this.ws.close();
-        return;
-      }
+      this.deviceId = msg.deviceId;
+      this.version = msg.version;
+      this.origin = msg.origin;
+      this.publicIp = msg.publicIp;
+      this.noMessagesSent = 0;
+      this.noMessagesReceived = 0;
+      this.responses = {};
 
       this.emit('init', this, message);
       this.init = false;
     } else {
-      const response = JSON.parse(message.toString());
-      const promise = this.responses[response.id];
+      const promise = this.responses[msg.id];
       if (promise) {
-        delete this.responses[response.id];
-        if (response.status == 200) {
+        delete this.responses[msg.id];
+        if (msg.status == 200) {
           this.log.debug(`${this.deviceId}: <MITMC Received job response message ${message.toString()}`);
 
-          promise.resolve(response.body);
+          promise.resolve(msg.body);
         } else {
           this.log.warn(`${this.deviceId}: <MITMC Received rejection message ${message.toString()}`);
-          promise.reject(`Status ${response.status} ${response.body?.errorReason ?? ''}`);
+          promise.reject(`Status ${msg.status} ${msg.body?.errorReason ?? ''}`);
         }
       } else {
         this.log.warn(`${this.deviceId}: <MITMC Unrecognized response ${message.toString()}`);
@@ -157,7 +161,9 @@ export class DeviceControlConnection extends EventEmitter {
     //< {"id":7,"status":200,"body":{"memFree":123, ...}}
 
     const memory = await this.executeCommand<MemoryStatus>('getMemoryUsage', null, 5000);
-    this.lastMemory = memory; // spy on result
+    if (typeof memory === 'object') {
+      this.lastMemory = memory; // spy on result
+    }
     return memory;
   }
 
