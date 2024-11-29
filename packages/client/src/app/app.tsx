@@ -13,7 +13,7 @@ const darkTheme = createTheme({
   type: 'dark',
 });
 
-if (process.env['NODE_ENV'] === 'development' && process.env['NX_ENABLE_MOCKS'] === '1') {
+if (process.env['NODE_ENV'] === 'development' && process.env['NX_PUBLIC_ENABLE_MOCKS'] === '1') {
   import('./server').then(({ makeServer }) => {
     makeServer({ environment: 'development' });
   });

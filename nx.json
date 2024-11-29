@@ -1,9 +1,6 @@
 {
   "extends": "nx/presets/core.json",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "affected": {
-    "defaultBase": "main"
-  },
   "defaultProject": "server",
   "generators": {
     "@nx/react": {
@@ -38,17 +35,26 @@
       "inputs": ["production", "^production"],
       "cache": true
     },
-    "lint": {
+    "@nx/jest:jest": {
+      "cache": true,
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+      "options": {
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "@nx/eslint:lint": {
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
-    },
-    "test": {
-      "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
-    },
-    "e2e": {
-      "cache": true
     }
   },
-  "nxCloudAccessToken": "YzIxM2YxMDYtYTUzYi00MmI3LTg0YzAtMWI1NTNmNDVlODdmfHJlYWQtd3JpdGU="
+  "nxCloudAccessToken": "YzIxM2YxMDYtYTUzYi00MmI3LTg0YzAtMWI1NTNmNDVlODdmfHJlYWQtd3JpdGU=",
+  "useInferencePlugins": false,
+  "defaultBase": "main",
+  "useLegacyCache": true
 }

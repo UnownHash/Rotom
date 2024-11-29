@@ -1,6 +1,7 @@
 import { Container, Navbar, styled, Text } from '@nextui-org/react';
 import { FC, ReactNode, MouseEvent } from 'react';
 import { useHref, useLinkClickHandler, useLocation } from 'react-router-dom';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { version } from '../../../../package.json';
 
 export const Box = styled('div', {
