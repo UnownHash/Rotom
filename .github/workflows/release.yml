@@ -24,12 +24,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
       - name: Install dependencies
         run: npm clean-install
-      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
-        run: npm audit signatures
-      - name: Release
+      - name: 'Setup git'
+        run: |
+          git config --global user.email "35898099+Fabio1988@users.noreply.github.com"
+          git config --global user.name "Release bot"
+      - name: 'Release app'
+        run: npx nx release --skip-publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx semantic-release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

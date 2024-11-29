@@ -56,5 +56,17 @@
   "nxCloudAccessToken": "YzIxM2YxMDYtYTUzYi00MmI3LTg0YzAtMWI1NTNmNDVlODdmfHJlYWQtd3JpdGU=",
   "useInferencePlugins": false,
   "defaultBase": "main",
+  "release": {
+    "projectsRelationship": "fixed",
+    "projects": ["packages/*"],
+    "version": {
+      "conventionalCommits": true
+    },
+    "changelog": {
+      "workspaceChangelog": {
+        "createRelease": "github"
+      }
+    }
+  },
   "useLegacyCache": true
 }
