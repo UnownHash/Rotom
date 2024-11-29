@@ -11,6 +11,7 @@
     "dev:client": "nx run client:dev",
     "dev:server": "nx run server:dev",
     "lint": "nx run-many --target=lint --all",
+    "prepare": "husky || true",
     "prettier": "prettier --write --ignore-unknown 'packages/**/*'",
     "start": "node dist/packages/server/main.js",
     "dev:mock": "NODE_ENV=development NX_PUBLIC_ENABLE_MOCKS=1 nx run-many --target=dev --all",
@@ -22,11 +23,29 @@
   "engines": {
     "node": ">=20.8"
   },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "**/*": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
   "prettier": {
     "singleQuote": true,
     "trailingComma": "all",
     "printWidth": 120,
     "arrowParens": "always"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   },
   "dependencies": {
     "@fastify/http-proxy": "^10.0.1",
@@ -53,6 +72,8 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
     "@faker-js/faker": "^7.3.0",
     "@nx/eslint": "20.1.1",
     "@nx/eslint-plugin": "20.1.1",
@@ -75,6 +96,7 @@
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
+    "commitlint": "^19.6.0",
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-cypress": "^2.10.3",
@@ -83,6 +105,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "5.0.0",
+    "husky": "^9.1.7",
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "miragejs": "^0.1.45",
