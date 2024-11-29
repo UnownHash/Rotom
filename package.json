@@ -11,7 +11,7 @@
     "dev:client": "nx run client:dev",
     "dev:server": "nx run server:dev",
     "lint": "nx run-many --target=lint --all",
-    "prepare": "husky install",
+    "prepare": "husky || true",
     "prettier": "prettier --write --ignore-unknown 'packages/**/*'",
     "start": "node dist/packages/server/main.js",
     "dev:mock": "NODE_ENV=development NX_PUBLIC_ENABLE_MOCKS=1 nx run-many --target=dev --all",
