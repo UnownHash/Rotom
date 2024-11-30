@@ -32,8 +32,8 @@ jobs:
         run: npm clean-install
       - name: 'Setup git'
         run: |
-          git config --global user.email "UnownWizard@unownhash.local"
-          git config --global user.name "Unown Wizard"
+          git config --global user.email "177540208+UnownWizard@users.noreply.github.com"
+          git config --global user.name "UnownWizard"
       - name: 'Release app'
         run: npx nx release --skip-publish
         env:
