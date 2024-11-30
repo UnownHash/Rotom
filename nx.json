@@ -53,7 +53,6 @@
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
     }
   },
-  "nxCloudAccessToken": "YzIxM2YxMDYtYTUzYi00MmI3LTg0YzAtMWI1NTNmNDVlODdmfHJlYWQtd3JpdGU=",
   "useInferencePlugins": false,
   "defaultBase": "main",
   "release": {
