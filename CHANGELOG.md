@@ -1,3 +1,13 @@
+## 2.0.2 (2024-11-30)
+
+### 🩹 Fixes
+
+- prevent crash when config contains comments ([a17fe18](https://github.com/UnownHash/Rotom/commit/a17fe18))
+
+### ❤️ Thank You
+
+- Naji Astier @na-ji
+
 ## 2.0.1 (2024-11-30)
 
 ### 🩹 Fixes
