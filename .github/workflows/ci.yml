@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - 'main'
   pull_request:
+  workflow_run:
+    workflows: ['Release']
+    types:
+      - completed
 
 permissions: write-all
 
