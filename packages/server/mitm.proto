@@ -13,6 +13,10 @@ message MitmRequest {
         enum LoginSource {
             UNSET = 0;
             PTC = 1;
+            PTC_OAUTH = 2;
+            FB = 3;
+            GOOGLE = 4;
+            N_KIDS = 5;
         }
 
         string username = 1;
@@ -43,20 +47,21 @@ message MitmRequest {
 }
 
 message MitmResponse {
+
     enum Status {
         UNSET = 0;
         SUCCESS = 200;
         ERROR_UNKNOWN = 500;
-        ERROR_GAME_NOT_READY = 501;
-        ERROR_LOGIN_IN_PROGRESS = 502;
-        ERROR_TOKEN_REJECTED = 503;
-        ERROR_NOT_LOGGED_IN = 504;
+        ERROR_RETRY_LATER = 501;
+        ERROR_WORKER_STOPPED = 502;
+        ERROR_RECONNECT = 503;
     }
 
     message LoginResponse {
         string worker_id = 1;
         AuthStatus status = 2;
         bool supports_compression = 3;
+        string useragent = 4;
     }
 
     message RpcResponse {
@@ -76,6 +81,7 @@ message MitmResponse {
         LoginResponse login_response = 3;
         RpcResponse rpc_response = 4;
     }
+    string mitm_error = 100;
 }
 
 message WelcomeMessage {
@@ -121,5 +127,7 @@ enum RpcStatus {
     RPC_STATUS_ACCESS_SUSPENDED = 16;
     RPC_STATUS_DEVICE_INCOMPATIBLE = 17;
     RPC_STATUS_ACCESS_RATE_LIMITED = 18;
+    RPC_STATUS_GOOGLE_PLAY_NOT_READY = 19;
+    RPC_STATUS_LOGIN_ERROR_BAIL = 20;
     RPC_STATUS_MITM_DISALLOWED_REQUEST = 99;
 }
