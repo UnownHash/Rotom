@@ -88,7 +88,7 @@ export class DeviceControlConnection extends EventEmitter {
       // Do nothing
     }
 
-    if (typeof msg !== 'object') {
+    if (typeof msg !== 'object' || Array.isArray(msg) || msg == null) {
       this.log.error(`Device /control - error decoding message, disconnecting`);
       this.ws.close();
       return;
