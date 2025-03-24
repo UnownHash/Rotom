@@ -88,7 +88,7 @@ export class DeviceControlConnection extends EventEmitter {
       // Do nothing
     }
 
-    if (typeof msg !== 'object') {
+    if (typeof msg !== 'object' || Array.isArray(msg) || msg == null) {
       this.log.error(`Device /control - error decoding message, disconnecting`);
       this.ws.close();
       return;
@@ -164,7 +164,7 @@ export class DeviceControlConnection extends EventEmitter {
     //< {"id":7,"status":200,"body":{"memFree":123, ...}}
 
     const memory = await this.executeCommand<MemoryStatus>('getMemoryUsage', null, 5000);
-    if (typeof memory === 'object') {
+    if (typeof memory === 'object' && !Array.isArray(msg) && msg != null) {
       this.lastMemory = memory; // spy on result
     }
     return memory;
