@@ -259,7 +259,7 @@ wssController.on('connection', (ws, req) => {
   const firstSpareWorkerId = nextSpareWorkerId;
   do {
     const mainDeviceId = identifyControlChannelFromWorkerId(nextSpareWorkerId);
-    log.info(`CONTROLLER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`);
+    log.debug(`CONTROLLER: Found ${mainDeviceId} connects to workerId ${nextSpareWorkerId}`);
     if (mainDeviceId == null) {
       log.info(`CONTROLLER: Warning - found ${nextSpareWorkerId} in pool with no record of main device`);
       unallocatedConnections.push(nextSpareWorkerId);
