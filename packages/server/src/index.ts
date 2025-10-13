@@ -288,7 +288,8 @@ wssController.on('connection', (ws, req) => {
     // no devices found, return the original one back to pool
     unallocatedConnections.push(nextSpareWorkerId);
     log.info(
-      `CONTROLLER: New connection from ${req.socket.remoteAddress} - no Devices available outside cooldown, rejecting`,
+      `CONTROLLER: New connection from ${req.socket.remoteAddress} - no Devices available outside cooldown, which is set to ${config.monitor.deviceCooldown} seconds.
+      If you're seeing this, either increase the number of devices, reduce the demand for workers, or decrease the device cooldown. Rejecting connection.`,
     );
     // error!
     ws.close(3001, 'All devices are in cooldown');
